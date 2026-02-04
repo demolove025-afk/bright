@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - APKL</title>
-    <link rel="stylesheet" href="admin-dashboard/style.css">
+    <link rel="stylesheet" href="./admin-dashboard/style.css">
     
     <!-- API Configuration (MUST be before other scripts) -->
     <script src="config-api.js"></script>
@@ -481,8 +481,18 @@
         // Load courses from API based on track
         async function loadCoursesFromAPI(track) {
             try {
-                const response = await fetch(`${window.appConfig?.API_URL || 'http://127.0.0.1:5002'}/api/courses?track=${track}`);
-                const data = await response.json();
+                        // If frontend is hosted on static GitHub Pages or similar (no backend),
+                        // skip API fetch and use local JSON instead.
+                        const apiHost = String(window.appConfig?.API_URL || window.location.origin).toLowerCase();
+                        if (apiHost.includes('github.io') || apiHost.includes('pages.dev')) {
+                            console.warn('⚠️ Detected static hosting with no backend. Loading local courses.json instead.');
+                            loadCoursesFromLocalJSON(track);
+                            return;
+                        }
+
+                        const url = (track && String(track).trim()) ? `${window.appConfig?.API_URL || 'http://127.0.0.1:5002'}/api/courses?track=${encodeURIComponent(track)}` : `${window.appConfig?.API_URL || 'http://127.0.0.1:5002'}/api/courses`;
+                        const response = await fetch(url);
+                        const data = await response.json();
                 
                 if (!data.success || !data.courses) {
                     console.error('Failed to fetch courses:', data);
@@ -1180,11 +1190,22 @@
 
                 // Build WebSocket URL from configured API_URL so it works on Render or localhost
                 try {
-                    const api = (window.appConfig && window.appConfig.API_URL) ? window.appConfig.API_URL : window.location.origin;
-                    const urlObj = new URL(api);
-                    const wsProtocol = (urlObj.protocol === 'https:') ? 'wss:' : 'ws:';
-                    const wsUrl = `${wsProtocol}//${urlObj.hostname}${urlObj.port ? ':' + urlObj.port : ''}`;
-                    ws = new WebSocket(wsUrl);
+                    // Prefer explicit WebSocket URL if configured
+                    const explicitWs = window.appConfig && window.appConfig.WS_URL;
+                    if (explicitWs) {
+                        ws = new WebSocket(explicitWs);
+                    } else {
+                        const api = (window.appConfig && window.appConfig.API_URL) ? window.appConfig.API_URL : window.location.origin;
+                        // If API is a static host (github pages), don't attempt WebSocket
+                        if (String(api).includes('github.io') || String(api).includes('pages.dev')) {
+                            console.warn('⚠️ WebSocket skipped: running on static host with no WebSocket server');
+                            return;
+                        }
+                        const urlObj = new URL(api);
+                        const wsProtocol = (urlObj.protocol === 'https:') ? 'wss:' : 'ws:';
+                        const wsUrl = `${wsProtocol}//${urlObj.hostname}${urlObj.port ? ':' + urlObj.port : ''}`;
+                        ws = new WebSocket(wsUrl);
+                    }
                 } catch (e) {
                     // Fallback to localhost
                     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
