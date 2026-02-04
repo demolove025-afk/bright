@@ -1,0 +1,59 @@
+{
+  "courses": [
+    {
+      "id": "FS101-1769868239415",
+      "code": "FS101",
+      "name": "Front",
+      "description": "iuiue",
+      "instructor": "pop loi",
+      "schedule": "37",
+      "students": 37,
+      "track": "fullstack",
+      "created_at": "2026-01-31T14:03:59.415Z",
+      "updated_at": "2026-01-31T14:03:59.415Z"
+    },
+    {
+      "id": "FS102-1769870685692",
+      "code": "FS102",
+      "name": "hjgyh",
+      "description": "ghg",
+      "instructor": "pop loi",
+      "schedule": "67",
+      "students": 7,
+      "track": "fullstack",
+      "created_at": "2026-01-31T14:44:45.801Z",
+      "updated_at": "2026-01-31T14:44:45.801Z"
+    },
+    {
+      "id": "FS103-1769872458144",
+      "code": "FS103",
+      "name": "Front",
+      "description": "6rhjghyugf",
+      "instructor": "pop loi",
+      "schedule": "89",
+      "students": 0,
+      "track": "fullstack",
+      "created_at": "2026-01-31T15:14:18.144Z",
+      "updated_at": "2026-01-31T15:14:18.144Z"
+    },
+    {
+      "id": "FS104-1769875714053",
+      "code": "FS104",
+      "name": "hjgyh",
+      "description": "hjvghjj",
+      "instructor": "pop loi",
+      "schedule": "iu",
+      "students": 0,
+      "track": "fullstack",
+      "created_at": "2026-01-31T16:08:34.084Z",
+      "updated_at": "2026-01-31T16:08:34.084Z"
+    }
+  ],
+  "metadata": {
+    "total_courses": 4,
+    "tracks": [
+      "fullstack"
+    ],
+    "last_updated": "2026-01-31T16:08:34.084Z"
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "tracks": [
+    {
+      "id": "1",
+      "code": "ui-ux",
+      "name": "UI/UX Design",
+      "description": "Learn to design beautiful and user-friendly interfaces",
+      "prices": {
+        "6-months": 300,
+        "1-year": 600
+      },
+      "level": "Beginner",
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "code": "web-dev",
+      "name": "Web Development",
+      "description": "Master HTML, CSS, JavaScript and modern web frameworks",
+      "prices": {
+        "6-months": 350,
+        "1-year": 700
+      },
+      "level": "Beginner",
+      "status": "active"
+    },
+    {
+      "id": "3",
+      "code": "mobile-dev",
+      "name": "Mobile Development",
+      "description": "Build native and cross-platform mobile applications",
+      "prices": {
+        "6-months": 400,
+        "1-year": 800
+      },
+      "level": "Intermediate",
+      "status": "active"
+    },
+    {
+      "id": "4",
+      "code": "fullstack",
+      "name": "Fullstack Development",
+      "description": "Complete web development from frontend to backend",
+      "prices": {
+        "6-months": 450,
+        "1-year": 900
+      },
+      "level": "Intermediate",
+      "status": "active"
+    },
+    {
+      "id": "5",
+      "code": "data-science",
+      "name": "Data Science",
+      "description": "Learn data analysis, visualization and machine learning",
+      "prices": {
+        "6-months": 375,
+        "1-year": 750
+      },
+      "level": "Intermediate",
+      "status": "active"
+    },
+    {
+      "id": "6",
+      "code": "cybersecurity",
+      "name": "Cybersecurity",
+      "description": "Master security protocols and ethical hacking",
+      "prices": {
+        "6-months": 400,
+        "1-year": 800
+      },
+      "level": "Advanced",
+      "status": "active"
+    },
+    {
+      "id": "7",
+      "code": "cloud",
+      "name": "Cloud Computing",
+      "description": "AWS, Azure and Google Cloud platform expertise",
+      "prices": {
+        "6-months": 375,
+        "1-year": 750
+      },
+      "level": "Intermediate",
+      "status": "active"
+    },
+    {
+      "id": "8",
+      "code": "ai",
+      "name": "Artificial Intelligence",
+      "description": "Deep learning, neural networks and AI applications",
+      "prices": {
+        "6-months": 450,
+        "1-year": 900
+      },
+      "level": "Advanced",
+      "status": "active"
+    },
+    {
+      "id": "9",
+      "code": "animation",
+      "name": "Animation",
+      "description": "2D and 3D animation techniques and software",
+      "prices": {
+        "6-months": 350,
+        "1-year": 700
+      },
+      "level": "Beginner",
+      "status": "active"
+    },
+    {
+      "id": "10",
+      "code": "marketing",
+      "name": "Digital Marketing",
+      "description": "SEO, SEM, social media and content marketing",
+      "prices": {
+        "6-months": 200,
+        "1-year": 400
+      },
+      "level": "Beginner",
+      "status": "active"
+    },
+    {
+      "id": "11",
+      "code": "python",
+      "name": "Python Programming",
+      "description": "Python for web development, automation and data science",
+      "prices": {
+        "6-months": 300,
+        "1-year": 600
+      },
+      "level": "Beginner",
+      "status": "active"
+    },
+    {
+      "id": "12",
+      "code": "devops",
+      "name": "DevOps Engineering",
+      "description": "Docker, Kubernetes and continuous integration/deployment",
+      "prices": {
+        "6-months": 400,
+        "1-year": 800
+      },
+      "level": "Advanced",
+      "status": "active"
+    },
+    {
+      "id": "13",
+      "code": "blockchain",
+      "name": "Blockchain Development",
+      "description": "Smart contracts and decentralized application development",
+      "prices": {
+        "6-months": 425,
+        "1-year": 850
+      },
+      "level": "Advanced",
+      "status": "active"
+    },
+    {
+      "id": "14",
+      "code": "iot",
+      "name": "IoT Development",
+      "description": "Internet of Things systems and embedded programming",
+      "prices": {
+        "6-months": 375,
+        "1-year": 750
+      },
+      "level": "Intermediate",
+      "status": "active"
+    },
+    {
+      "id": "15",
+      "code": "gamedev",
+      "name": "Game Development",
+      "description": "Unity and Unreal Engine game development",
+      "prices": {
+        "6-months": 400,
+        "1-year": 800
+      },
+      "level": "Intermediate",
+      "status": "active"
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2026-01-29T00:00:00Z",
+    "totalTracks": 15,
+    "version": "1.0"
+  }
+}

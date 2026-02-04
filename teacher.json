@@ -1,0 +1,78 @@
+{
+  "teachers": [
+    {
+      "id": "T1769681623315",
+      "name": "olamide",
+      "email": "godsowb@gmail.com",
+      "password": "$2b$10$tV449JSAOqorwmnk.PONhurgitRDLXPO.RRTHVO8YRJraQQLA3JzK",
+      "phone": "9138154963",
+      "track": "animation",
+      "specialization": "Animination",
+      "courses": [],
+      "registeredAt": "2026-01-29T10:13:43.315Z",
+      "status": "active"
+    },
+    {
+      "id": "T1769774214653",
+      "name": "olamide",
+      "email": "o13183656@gmail.com",
+      "password": "$2b$10$zhsWBPTmmxluoIHVQxflqeHY0HbdBzsNMIFYsoVF8ivh0BQSIkdri",
+      "phone": "87854433356",
+      "track": "fullstack",
+      "specialization": "Full stack",
+      "courses": [],
+      "registeredAt": "2026-01-30T11:56:54.653Z",
+      "status": "active"
+    },
+    {
+      "id": "T1769861053087",
+      "name": "pop loi",
+      "email": "ayomideoluniyi49@gmail.com",
+      "password": "$2b$10$x1CJZVDvKiLKUhMjvyNnheofecklZKapwkSir0R48wSYhV2i.NxD2",
+      "phone": "0904354355",
+      "track": "fullstack",
+      "specialization": "Full Stack develope",
+      "courses": [],
+      "registeredAt": "2026-01-31T12:04:13.087Z",
+      "status": "active"
+    },
+    {
+      "id": "T1770030412950",
+      "name": "KJFKF",
+      "email": "ad9046514@gmail.com",
+      "password": "$2b$10$jhUTpNY4/5UuofOCFb6CjuXpV09r8S4SHGVtDqcCQVcfs3YXp9aCu",
+      "phone": "48845473954",
+      "track": "fullstack",
+      "specialization": "fULL",
+      "courses": [],
+      "registeredAt": "2026-02-02T11:06:52.950Z",
+      "status": "active"
+    },
+    {
+      "id": "T1770114657738",
+      "name": "Olamummy",
+      "email": "oluniyitemilade@gmail.com",
+      "password": "$2b$10$eCp8En3B3lBhc/eXbiehqO45o0gnF4kSzTVWoGHZ1Ja5u3IpJwAwK",
+      "phone": "9193435436",
+      "track": "webdev",
+      "specialization": "fULLSTACK",
+      "courses": [],
+      "registeredAt": "2026-02-03T10:30:57.738Z",
+      "status": "active"
+    },
+    {
+      "id": "T1770115185409",
+      "name": "Olamummy",
+      "email": "ayomide@gmail.com",
+      "password": "$2b$10$2RwOkNMVU/30o8jSRM8Xjuf4Bshr0xQsCDMqFF7yrYyltXAZWVmsy",
+      "phone": "9193435436",
+      "track": "fullstack",
+      "specialization": "fULLSTACK",
+      "courses": [],
+      "registeredAt": "2026-02-03T10:39:45.409Z",
+      "status": "active"
+    }
+  ],
+  "totalTeachers": 6,
+  "lastUpdated": "2026-02-03T10:39:45.409Z"
+}

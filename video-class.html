@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APKL - Video Class</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    /* Main video area */
+    .main-video-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0a0a0a;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #2a2a2a;
+    }
+
+    .video-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0a0a0a;
+      position: relative;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    /* Participants panel */
+    .participants-panel {
+      width: 250px;
+      background: #1a1a1a;
+      border: 2px solid #2a2a2a;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .participants-header {
+      padding: 15px;
+      background: #2a2a2a;
+      border-bottom: 1px solid #3a3a3a;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .participants-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .participant-item {
+      padding: 10px;
+      margin: 8px 0;
+      background: #2a2a2a;
+      border-radius: 6px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .participant-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0066cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      background: #2a2a2a;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: #0066cc;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0052a3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e68900;
+      transform: translateY(-2px);
+    }
+
+    .btn.active {
+      background: #28a745;
+    }
+
+    .btn.active:hover {
+      background: #218838;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Status indicators */
+    .status {
+      padding: 15px;
+      background: #2a2a2a;
+      border-top: 1px solid #3a3a3a;
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #dc3545;
+    }
+
+    .status-indicator.active {
+      background: #28a745;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #2a2a2a;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .modal-content p {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      border: 3px solid #3a3a3a;
+      border-top: 3px solid #0066cc;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Alert */
+    .alert {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      border-left: 4px solid;
+    }
+
+    .alert-error {
+      background: #3d2e2e;
+      border-left-color: #dc3545;
+      color: #ff6b6b;
+    }
+
+    .alert-success {
+      background: #2d3d2e;
+      border-left-color: #28a745;
+      color: #51cf66;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .participants-panel {
+        width: 100%;
+        height: 200px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Main video area -->
+    <div class="main-video-area">
+      <div class="video-container">
+        <video id="mainVideo" autoplay muted></video>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="btn btn-primary" id="toggleVideoBtn" title="Toggle camera">
+          📹 Camera
+        </button>
+        <button class="btn btn-primary" id="toggleAudioBtn" title="Toggle microphone">
+          🎤 Microphone
+        </button>
+        <button class="btn btn-warning" id="shareScreenBtn" title="Share screen (teacher only)">
+          📺 Share Screen
+        </button>
+        <button class="btn btn-danger" id="endClassBtn" title="End class">
+          🛑 End Class
+        </button>
+      </div>
+
+      <!-- Status -->
+      <div class="status">
+        <div class="status-item">
+          <div class="status-indicator active"></div>
+          <span id="videoStatus">Video: On</span>
+        </div>
+        <div class="status-item">
+          <div class="status-indicator active"></div>
+          <span id="audioStatus">Audio: On</span>
+        </div>
+        <div class="status-item">
+          <div class="status-indicator"></div>
+          <span id="screenStatus">Screen: Off</span>
+        </div>
+        <div class="status-item">
+          <span id="connectionStatus">Connection: Connecting...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participants panel -->
+    <div class="participants-panel">
+      <div class="participants-header">👥 Participants</div>
+      <div class="participants-list" id="participantsList">
+        <div class="participant-item">
+          <div class="spinner"></div>
+          <span>Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- End class modal -->
+  <div class="modal" id="endClassModal">
+    <div class="modal-content">
+      <h2>End Class?</h2>
+      <p>Are you sure you want to end this class? Students will be disconnected.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="document.getElementById('endClassModal').classList.remove('active')">
+          Cancel
+        </button>
+        <button class="btn btn-danger" id="confirmEndBtn">
+          End Class
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="class-webrtc.js"></script>
+  <script>
+    // Get URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const meetingId = params.get('meetingId') || 'test-meeting-' + Date.now();
+    const userId = params.get('userId') || 'user-' + Math.random().toString(36).substr(2, 9);
+    const isTeacher = params.get('role') === 'teacher';
+
+    let webrtcSession = null;
+    let videoEnabled = true;
+    let audioEnabled = true;
+
+    // Initialize
+    async function initializeClass() {
+      console.log('🎬 Initializing class...');
+      console.log({ meetingId, userId, isTeacher });
+
+      try {
+        // Create WebRTC session
+        webrtcSession = new ClassWebRTCSession({
+          meetingId,
+          userId,
+          isTeacher,
+          onRemoteStream: handleRemoteStream,
+          onPeerConnect: handlePeerConnect,
+          onPeerDisconnect: handlePeerDisconnect,
+          onScreenShare: handleScreenShare,
+          onError: handleError
+        });
+
+        // Initialize
+        const success = await webrtcSession.initialize();
+
+        if (success) {
+          // Display local video
+          const mainVideo = document.getElementById('mainVideo');
+          if (webrtcSession.localStream) {
+            mainVideo.srcObject = webrtcSession.localStream;
+          }
+
+          updateStatus('Connection: Connected ✅', '#28a745');
+
+          // Disable screen share button if not teacher
+          if (!isTeacher) {
+            document.getElementById('shareScreenBtn').disabled = true;
+          }
+        } else {
+          showAlert('Failed to initialize WebRTC session', 'error');
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+        showAlert('Error: ' + error.message, 'error');
+      }
+    }
+
+    // Handle remote stream
+    function handleRemoteStream(data) {
+      const { type, stream, userId, track } = data;
+
+      if (type === 'local') {
+        console.log('Local stream ready');
+        // Already handled in initialize
+        return;
+      }
+
+      if (type === 'remote') {
+        console.log('Remote stream from:', userId);
+        
+        // In a real app, create video elements for each remote participant
+        // For now, just log the stream
+        addParticipant(userId);
+      }
+    }
+
+    // Handle peer connect
+    function handlePeerConnect(data) {
+      console.log('Peer connected:', data.userId);
+      addParticipant(data.userId);
+    }
+
+    // Handle peer disconnect
+    function handlePeerDisconnect(data) {
+      console.log('Peer disconnected:', data.userId);
+      removeParticipant(data.userId);
+    }
+
+    // Handle screen share
+    function handleScreenShare(data) {
+      const { active, userId } = data;
+      const status = document.getElementById('screenStatus');
+      
+      if (active) {
+        status.textContent = `📺 Screen: On (${userId})`;
+        document.getElementById('shareScreenBtn').classList.add('active');
+      } else {
+        status.textContent = '📺 Screen: Off';
+        document.getElementById('shareScreenBtn').classList.remove('active');
+      }
+    }
+
+    // Handle errors
+    function handleError(error) {
+      console.error('WebRTC Error:', error);
+      showAlert('Error: ' + error.message, 'error');
+    }
+
+    // Add participant to list
+    function addParticipant(userId) {
+      const list = document.getElementById('participantsList');
+      
+      if (list.querySelector('[data-user-id="' + userId + '"]')) {
+        return; // Already added
+      }
+
+      if (list.innerHTML.includes('Loading...')) {
+        list.innerHTML = ''; // Clear loading
+      }
+
+      const item = document.createElement('div');
+      item.className = 'participant-item';
+      item.setAttribute('data-user-id', userId);
+      item.innerHTML = `
+        <div class="participant-avatar">${userId.charAt(0).toUpperCase()}</div>
+        <span>${userId}${userId === params.get('userId') ? ' (You)' : ''}</span>
+      `;
+      list.appendChild(item);
+
+      console.log('Participant added:', userId);
+    }
+
+    // Remove participant from list
+    function removeParticipant(userId) {
+      const item = document.querySelector('[data-user-id="' + userId + '"]');
+      if (item) {
+        item.remove();
+        console.log('Participant removed:', userId);
+      }
+    }
+
+    // Update status text
+    function updateStatus(text, color) {
+      const status = document.getElementById('connectionStatus');
+      status.textContent = text;
+      status.style.color = color;
+    }
+
+    // Show alert
+    function showAlert(message, type = 'info') {
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-' + type;
+      alert.textContent = message;
+      
+      const controls = document.querySelector('.controls');
+      controls.insertBefore(alert, controls.firstChild);
+
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    // Toggle video
+    document.getElementById('toggleVideoBtn').addEventListener('click', () => {
+      if (!webrtcSession) return;
+
+      videoEnabled = !videoEnabled;
+      webrtcSession.toggleVideo(videoEnabled);
+
+      const btn = document.getElementById('toggleVideoBtn');
+      btn.classList.toggle('active');
+      document.getElementById('videoStatus').textContent = `Video: ${videoEnabled ? 'On' : 'Off'}`;
+    });
+
+    // Toggle audio
+    document.getElementById('toggleAudioBtn').addEventListener('click', () => {
+      if (!webrtcSession) return;
+
+      audioEnabled = !audioEnabled;
+      webrtcSession.toggleAudio(audioEnabled);
+
+      const btn = document.getElementById('toggleAudioBtn');
+      btn.classList.toggle('active');
+      document.getElementById('audioStatus').textContent = `Audio: ${audioEnabled ? 'On' : 'Off'}`;
+    });
+
+    // Share screen
+    document.getElementById('shareScreenBtn').addEventListener('click', async () => {
+      if (!webrtcSession || !isTeacher) return;
+
+      if (webrtcSession.screenSharingActive) {
+        await webrtcSession.stopScreenShare();
+      } else {
+        await webrtcSession.startScreenShare();
+      }
+    });
+
+    // End class
+    document.getElementById('endClassBtn').addEventListener('click', () => {
+      document.getElementById('endClassModal').classList.add('active');
+    });
+
+    document.getElementById('confirmEndBtn').addEventListener('click', () => {
+      if (webrtcSession) {
+        webrtcSession.endSession();
+      }
+      document.getElementById('endClassModal').classList.remove('active');
+      
+      setTimeout(() => {
+        window.location.href = 'student.html';
+      }, 1000);
+    });
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', initializeClass);
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (webrtcSession) {
+        webrtcSession.endSession();
+      }
+    });
+  </script>
+</body>
+</html>

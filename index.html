@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Permissions-Policy" content="compute-pressure=(), sync-xhr=(), interest-cohort=()">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Bucodel — University Management Portal</title>
+	<meta name="description" content="Bucodel university management portal">
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23667eea'>B</text></svg>">
+	<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23667eea'>B</text></svg>">
+	<!-- Optimize CSS delivery -->
+	<link rel="stylesheet" href="styles.css" media="all" type="text/css">
+	<!-- Preconnect to external services -->
+	<link rel="preconnect" href="https://cdn.jsdelivr.net">
+	<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+	<!-- Configuration -->
+	<script src="config.js"></script>
+	<!-- Performance & Security Optimization -->
+	<script>
+		// Suppress slow network and font loading warnings
+		if (window.console && window.console.warn) {
+			const originalWarn = console.warn;
+			console.warn = function(...args) {
+				const message = args[0]?.toString() || '';
+				// Filter out slow network, font loading, and intervention warnings
+				if (message.includes('[Intervention]') || 
+				    message.includes('[Violation]') || 
+				    message.includes('Slow network') ||
+				    message.includes('fallback font')) {
+					return; // Suppress these warnings
+				}
+				originalWarn.apply(console, args);
+			};
+		}
+		// Optimize font loading with system fonts
+		document.documentElement.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+	</script>
+</head>
+<body>
+	<!-- Login/Registration Section -->
+	<div id="auth-section" class="auth-section">
+		<div class="auth-container">
+			<div class="auth-box"> 
+				<div class="auth-header">
+					<div class="university-logo">
+						<div class="logo-icon">🧠</div>
+					</div>
+					<h1>Brightmind Academy</h1>
+					<p>Online Learning Platform</p>
+					<p class="auth-tagline">Empowering Minds, Transforming Futures</p>
+				</div>
+
+				<!-- Login Form -->
+				<form id="login-form" class="auth-form active">
+					<h2>Welcome Back</h2>
+					<div class="form-group">
+						<label for="login-email">Email</label>
+						<input type="email" id="login-email" placeholder="your@email.com" required>
+					</div>
+					<div class="form-group">
+						<label for="login-password">Password</label>
+					<div class="password-wrapper">
+						<input type="password" id="login-password" placeholder="••••••••" required>
+						<button type="button" class="toggle-password" onclick="togglePasswordVisibility('login-password')">👁️</button>
+					</div>
+					</div>
+					<button type="submit" class="btn-auth">Sign In</button>
+					<p class="auth-toggle">Don't have an account? <a href="#" onclick="toggleForms(event)">Register</a></p>
+				</form>
+
+				<!-- Registration Form -->
+				<form id="register-form" class="auth-form">
+					<h2>Create Account</h2>
+					<div class="form-group">
+						<label for="register-name">Full Name</label>
+						<input type="text" id="register-name" placeholder="John Doe" required>
+					</div>
+					<div class="form-group">
+						<label for="register-email">Email</label>
+						<input type="email" id="register-email" placeholder="your@email.com" required>
+					</div>
+					<div class="form-group">
+						<label for="register-phone">Phone Number</label>
+						<input type="tel" id="register-phone" placeholder="+234 (0) 800 1234 567" required>
+					</div>
+					<div class="form-group">
+						<label for="register-country">Country</label>
+						<select id="register-country" required>
+							<option value="">Select Country</option>
+							<option value="Nigeria">Nigeria</option>
+							<option value="Ghana">Ghana</option>
+							<option value="Kenya">Kenya</option>
+							<option value="South Africa">South Africa</option>
+							<option value="Uganda">Uganda</option>
+							<option value="Tanzania">Tanzania</option>
+							<option value="Ethiopia">Ethiopia</option>
+							<option value="Cameroon">Cameroon</option>
+							<option value="Egypt">Egypt</option>
+							<option value="Morocco">Morocco</option>
+							<option value="Senegal">Senegal</option>
+							<option value="Côte d'Ivoire">Côte d'Ivoire</option>
+							<option value="Zimbabwe">Zimbabwe</option>
+							<option value="Botswana">Botswana</option>
+							<option value="Mauritius">Mauritius</option>
+							<option value="Other">Other</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<!-- Track & Duration (added back to registration) -->
+						<div class="form-row">
+							<div class="form-group">
+								<label for="register-track">Track</label>
+								<select id="register-track" required>
+									<option value="">Select Track</option>
+									<option value="ui-ux">UI/UX Design</option>
+									<option value="web-dev">Web Development</option>
+									<option value="mobile-dev">Mobile Development</option>
+									<option value="fullstack">Fullstack Development</option>
+									<option value="data-science">Data Science</option>
+									<option value="cybersecurity">Cybersecurity</option>
+									<option value="cloud">Cloud Computing</option>
+									<option value="ai">Artificial Intelligence</option>
+									<option value="animation">Animation</option>
+									<option value="marketing">Digital Marketing</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="register-duration">Duration</label>
+								<select id="register-duration" required>
+									<option value="">Select Duration</option>
+
+									<option value="1-year">1 Year Program</option>
+									<option value="2-years">2 Years Program</option>
+								</select>
+							</div>
+						</div>
+						<label for="register-address">Address</label>
+						<input type="text" id="register-address" placeholder="Enter your full address" required>
+					</div>
+					<div class="form-group">
+						<label for="register-password">Password</label>
+					<div class="password-wrapper">
+						<input type="password" id="register-password" placeholder="••••••••" required>
+						<button type="button" class="toggle-password" onclick="togglePasswordVisibility('register-password')">👁️</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="register-confirm">Confirm Password</label>
+					<div class="password-wrapper">
+						<input type="password" id="register-confirm" placeholder="••••••••" required>
+						<button type="button" class="toggle-password" onclick="togglePasswordVisibility('register-confirm')">👁️</button>
+					</div>
+					</div>
+					<button type="submit" class="btn-auth">Create Account</button>
+					<p class="auth-toggle">Already have an account? <a href="#" onclick="toggleForms(event)">Sign In</a></p>
+				</form>
+
+				<!-- Email Verification Form -->
+				<form id="verify-form" class="auth-form">
+					<h2>Verify Your Email</h2>
+					<p class="verify-description">
+						We've sent a 6-digit code to your email. Please enter it below to complete registration.
+					</p>
+					<div id="verify-email-display" class="verify-email-display"></div>
+					<div class="form-group">
+						<label for="verify-code">Verification Code</label>
+						<input type="text" id="verify-code" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required autocomplete="off">
+					</div>
+					<button type="submit" class="btn-auth">Verify Code</button>
+					<p class="auth-toggle">
+						Didn't receive the code? <a href="#" onclick="resendVerificationCode(event)">Resend Code</a>
+					</p>
+					<p class="auth-toggle">
+						<a href="#" onclick="backToRegistration(event)">Back to Registration</a>
+					</p>
+				</form>
+			</div>
+			<div class="auth-image">
+				<div class="image-placeholder">
+					<div class="graduates-section">
+						<h3>Transform Your Future</h3>
+						<p>Join thousands of successful graduates</p>
+						<div class="success-stats">
+							<div class="stat">
+								<div class="stat-number">15,000+</div>
+								<div class="stat-label">Graduates</div>
+							</div>
+							<div class="stat">
+								<div class="stat-number">98%</div>
+								<div class="stat-label">Success Rate</div>
+							</div>
+							<div class="stat">
+								<div class="stat-number">50+</div>
+								<div class="stat-label">Programs</div>
+							</div>
+						</div>
+						<p class="tagline">Your dreams, our commitment to excellence</p>
+						<div class="graduate-icon">👨‍🎓 👩‍🎓</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Setup Section (Multi-step Form) -->
+	<div id="setup-section" class="setup-section hidden">
+		<div class="setup-modal">
+			<div class="setup-header">
+				<h2>Thanks for registration! Kindly wait for your application to be approved</h2>
+			</div>
+
+			<!-- Step 2.5: Payment Details -->
+			<div id="step-2.5" class="setup-step">
+				<div class="step-indicator">
+					<div class="step-badge">1</div>
+					<h3>Complete Your Payment</h3>
+				</div>
+
+				<div class="step-content">
+					<!-- Duration & Amount Selection -->
+					<div class="duration-amount-section">
+						<h4>📅 Select Duration & View Amount</h4>
+						<div class="duration-buttons-group">
+							<button class="duration-btn active" data-duration="6-months" onclick="updatePaymentDuration('6-months')">
+								<div class="duration-value">6 Months</div>
+								<div class="duration-price" id="price-6-months">$0</div>
+								<div class="duration-note">(50% of yearly)</div>
+							</button>
+							<button class="duration-btn" data-duration="1-year" onclick="updatePaymentDuration('1-year')">
+								<div class="duration-value">1 Year</div>
+								<div class="duration-price" id="price-1-year">$0</div>
+								<div class="duration-note">(Full Year)</div>
+							</button>
+						</div>
+					</div>
+
+					<!-- Payment Amount Display -->
+					<div class="payment-amount-box">
+						<div class="amount-label">Amount to Pay</div>
+						<div class="amount-display" id="amount-display">$0</div>
+						<div class="amount-description" id="amount-description">Select a payment method to continue</div>
+					</div>
+
+					<!-- Payment Method Selection -->
+					<div class="payment-methods-section">
+						<h4>Choose Payment Method</h4>
+						<div class="payment-methods-grid">
+							<!-- Credit Card -->
+							<label class="payment-method-card">
+								<input type="radio" name="payment-method" value="credit-card" class="payment-radio">
+								<div class="method-content">
+									<div class="method-icon">💳</div>
+									<div class="method-name">Credit Card</div>
+									<div class="method-desc">Visa, Mastercard</div>
+								</div>
+							</label>
+
+							<!-- Bank Transfer -->
+							<label class="payment-method-card">
+								<input type="radio" name="payment-method" value="bank-transfer" class="payment-radio">
+								<div class="method-content">
+									<div class="method-icon">🏦</div>
+									<div class="method-name">Bank Transfer</div>
+									<div class="method-desc">Direct transfer</div>
+								</div>
+							</label>
+
+							<!-- PayPal -->
+							<label class="payment-method-card">
+								<input type="radio" name="payment-method" value="paypal" class="payment-radio">
+								<div class="method-content">
+									<div class="method-icon">🅿️</div>
+									<div class="method-name">PayPal</div>
+									<div class="method-desc">Secure payment</div>
+								</div>
+							</label>
+
+							<!-- Gift Card -->
+							<label class="payment-method-card">
+								<input type="radio" name="payment-method" value="gift-card" class="payment-radio">
+								<div class="method-content">
+									<div class="method-icon">🎁</div>
+									<div class="method-name">Gift Card</div>
+									<div class="method-desc">Use your card</div>
+								</div>
+							</label>
+						</div>
+					</div>
+
+					<!-- Payment Details Forms -->
+					<!-- Credit Card Form -->
+					<div id="card-details" class="payment-details hidden">
+						<h4>💳 Credit Card Details</h4>
+						<div class="form-group">
+							<label for="card-name">Cardholder Name</label>
+							<input type="text" id="card-name" class="text-input" placeholder="John Doe" required>
+						</div>
+						<div class="form-group">
+							<label for="card-number">Card Number</label>
+							<input type="text" id="card-number" class="text-input" placeholder="1234 5678 9012 3456" maxlength="19" required>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="card-expiry">Expiry Date</label>
+								<input type="text" id="card-expiry" class="text-input" placeholder="MM/YY" maxlength="5" required>
+							</div>
+							<div class="form-group">
+								<label for="card-cvc">CVC</label>
+								<input type="text" id="card-cvc" class="text-input" placeholder="123" maxlength="4" required>
+							</div>
+						</div>
+					</div>
+
+					<!-- PayPal Form -->
+					<div id="paypal-details" class="payment-details hidden">
+						<h4>🅿️ PayPal Account</h4>
+						<div class="form-group">
+							<label for="paypal-email">PayPal Email</label>
+							<input type="email" id="paypal-email" class="text-input" placeholder="your@email.com" required>
+						</div>
+						<p class="payment-notice">You will be redirected to PayPal to complete your payment securely.</p>
+					</div>
+
+					<!-- Bank Transfer Form -->
+					<div id="bank-details" class="payment-details hidden">
+						<h4>🏦 Bank Transfer Details</h4>
+						<div class="form-group">
+							<label for="select-bank">Select Your Bank</label>
+							<select id="select-bank" class="text-input" required>
+								<option value="">-- Choose a Bank --</option>
+								<option value="Access Bank">Access Bank</option>
+								<option value="Fidelity Bank">Fidelity Bank</option>
+								<option value="First Bank">First Bank</option>
+								<option value="Guaranty Trust Bank">Guaranty Trust Bank (GTB)</option>
+								<option value="NOVA Bank">NOVA Bank</option>
+								<option value="Opay">Opay</option>
+								<option value="Polaris Bank">Polaris Bank</option>
+								<option value="Stanbic IBTC">Stanbic IBTC</option>
+								<option value="Standard Chartered">Standard Chartered</option>
+								<option value="Sterling Bank">Sterling Bank</option>
+								<option value="Surity Trust Bank">Surity Trust Bank</option>
+								<option value="Titan Bank">Titan Bank</option>
+								<option value="UBA">UBA (United Bank for Africa)</option>
+								<option value="Union Bank">Union Bank</option>
+								<option value="Wema Bank">Wema Bank</option>
+								<option value="Zenith Bank">Zenith Bank</option>
+								<option value="Other">Other</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="bank-account">Account Number</label>
+							<input type="text" id="bank-account" class="text-input" placeholder="0123456789" required>
+						</div>
+						<div class="form-group">
+							<label for="bank-routing">PIN/Password</label>
+							<input type="password" id="bank-routing" class="text-input" placeholder="Enter your PIN" required>
+						</div>
+					</div>
+
+					<!-- Gift Card Form -->
+					<div id="giftcard-details" class="payment-details hidden">
+						<h4>🎁 Gift Card Details</h4>
+						<div class="form-group">
+							<label for="giftcard-number">Gift Card Number</label>
+							<input type="text" id="giftcard-number" class="text-input" placeholder="1234-5678-9012-3456" required>
+						</div>
+						<div class="form-group">
+							<label for="giftcard-pin">PIN (if applicable)</label>
+							<input type="password" id="giftcard-pin" class="text-input" placeholder="Enter PIN" required>
+						</div>
+					</div>
+
+					<!-- Payment Summary -->
+					<div class="payment-summary">
+						<h4>📋 Payment Summary</h4>
+						<div class="summary-item">
+							<span>📚 Course/Track:</span>
+							<span id="summary-course">--</span>
+						</div>
+						<div class="summary-item">
+							<span>⏱️ Duration:</span>
+							<span id="summary-duration">--</span>
+						</div>
+						<div class="summary-item">
+							<span>💰 Price per Year:</span>
+							<span id="summary-price">--</span>
+						</div>
+						<div class="summary-item total">
+							<span>💳 Total Amount to Pay:</span>
+							<span id="summary-total">--</span>
+						</div>
+					</div>
+
+					<div class="step-buttons">
+						<button class="btn-back" onclick="previousSetupStep()">← Back</button>
+						<button class="btn-continue" onclick="authorizePayment()">✓ Authorize Payment</button>
+					</div>
+				</div>
+			</div>
+	</div>
+
+	<!-- Dashboard Section -->
+	<div id="dashboard-section" class="dashboard-section">
+		<!-- Header -->
+		<header class="header">
+			<div class="header-content">
+				<div class="logo">
+					<button id="toggle-sidebar" class="btn-toggle-sidebar" onclick="toggleSidebar()">☰</button>
+					<h1>Bucodel</h1>
+					<p>University Management System</p>
+				</div>
+				<div class="header-actions">
+					<button class="btn-search">🔍 Search</button>
+					<button class="btn-profile">👤</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- Dashboard Layout with Sidebar -->
+		<div class="dashboard-wrapper">
+			<!-- Sidebar -->
+			<aside class="sidebar">
+				<div class="sidebar-header">
+					<h3>Menu</h3>
+				</div>
+				<nav class="sidebar-nav">
+				<a href="#" class="nav-item active" data-view="announcement">
+						<span class="nav-icon">📢</span>
+						<span class="nav-label">Announcement</span>
+					</a>
+					<a href="#" class="nav-item" data-view="orientation">
+						<span class="nav-icon">🧭</span>
+						<span class="nav-label">Orientation</span>
+					</a>
+					<a href="#" class="nav-item" data-view="spiritual">
+						<span class="nav-icon">✨</span>
+						<span class="nav-label">Spiritual Emphasis</span>
+					</a>
+					<a href="#" class="nav-item" data-view="activities">
+						<span class="nav-icon">📚</span>
+						<span class="nav-label">Class Activities</span>
+					</a>
+					<a href="#" class="nav-item" data-view="programming">
+						<span class="nav-icon">💻</span>
+						<span class="nav-label">Programming</span>
+					</a>
+				</nav>
+				<div class="sidebar-footer">
+					<button class="btn-logout" onclick="logout()">🚪 Logout</button>
+				</div>
+			</aside>
+
+			<!-- Main Content -->
+			<main class="main-content">
+				<div class="content-wrapper">
+					<!-- Announcement View -->
+					<div id="announcement-view" class="content-view active">
+						<div class="section-header">
+							<h2>📢 Announcements</h2>
+							<p>Latest university announcements and updates</p>
+						</div>
+						<div class="content-box">
+							<div class="videos-grid">
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" sandbox="allow-scripts allow-popups" title="System Maintenance Update video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>System Maintenance Update</h3>
+										<p>Server maintenance scheduled for tonight</p>
+										<small>Today • 2:30 PM</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/jNQXAC9IVRw" frameborder="0" sandbox="allow-scripts allow-popups" title="Exam Schedule Released video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Exam Schedule Released</h3>
+										<p>Final examination schedule for 2nd semester</p>
+										<small>Yesterday • 1:15 PM</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/ZbZSe6N_BXs" frameborder="0" sandbox="allow-scripts allow-popups" title="Holiday Notice video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Holiday Notice</h3>
+										<p>Campus will be closed on January 26</p>
+										<small>2 days ago</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Orientation View -->
+					<div id="orientation-view" class="content-view">
+						<div class="section-header">
+							<h2>🧭 Orientation</h2>
+							<p>New student orientation and campus guide</p>
+						</div>
+						<div class="content-box">
+							<div class="videos-grid">
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/aqz-KE-bpKQ" frameborder="0" sandbox="allow-scripts allow-popups" title="Campus Tour video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Campus Tour</h3>
+										<p>Complete tour of campus facilities and landmarks</p>
+										<small>Duration: 15 min</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/9bZkp7q19f0" frameborder="0" sandbox="allow-scripts allow-popups" title="Academic Advising video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Academic Advising</h3>
+										<p>Understanding degree requirements and course selection</p>
+										<small>Duration: 12 min</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/zrjSaEVcWlc" frameborder="0" sandbox="allow-scripts allow-popups" title="Student Services Overview video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Student Services Overview</h3>
+										<p>Learn about support services available to students</p>
+										<small>Duration: 10 min</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Spiritual Emphasis View -->
+					<div id="spiritual-view" class="content-view">
+						<div class="section-header">
+							<h2>✨ Spiritual Emphasis</h2>
+							<p>Spiritual growth and faith-based activities</p>
+						</div>
+						<div class="content-box">
+							<div class="videos-grid">
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/k5NyIbT0L2w" frameborder="0" sandbox="allow-scripts allow-popups" title="Daily Reflection and Meditation video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Daily Reflection & Meditation</h3>
+										<p>Start your day with spiritual guidance and reflection</p>
+										<small>Daily at 7:30 AM</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/P3FP7zuGQJE" frameborder="0" sandbox="allow-scripts allow-popups" title="Scripture Study video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Scripture Study</h3>
+										<p>Explore sacred texts and spiritual teachings</p>
+										<small>Wednesday • 5 PM</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/uyDGg_6uHLE" frameborder="0" sandbox="allow-scripts allow-popups" title="Community Service and Worship video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Community Service & Worship</h3>
+										<p>Join us in meaningful service and worship experiences</p>
+										<small>Various times</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Class Activities View -->
+					<div id="activities-view" class="content-view">
+						<div class="section-header">
+							<h2>📚 Class Activities</h2>
+							<p>Select a course to view its activities and resources</p>
+						</div>
+						<div class="content-box">
+							<!-- Course Selector -->
+							<div class="course-selector-container">
+								<label for="course-selector" class="course-selector-label">Select a Course:</label>
+								<select id="course-selector" class="course-selector">
+									<option value="">-- Choose a Course --</option>
+								</select>
+							</div>
+							<div class="videos-grid" id="videos-grid">
+								<!-- Course videos will be populated here dynamically based on registered courses -->
+								<div class="no-courses-message" id="no-courses-message">
+									<p>No courses registered yet. Complete your profile setup to register courses.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Programming View -->
+					<div id="programming-view" class="content-view">
+						<div class="section-header">
+							<h2>💻 Programming</h2>
+							<p>Programming courses and resources</p>
+						</div>
+						<div class="content-box">
+							<div class="videos-grid">
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/rfscVS0vtik" frameborder="0" sandbox="allow-scripts allow-popups" title="Python Fundamentals course video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Python Fundamentals</h3>
+										<p>Learn the basics of Python programming from scratch</p>
+										<small>8 videos • 4 hours</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/kJEsTjH5mKg" frameborder="0" sandbox="allow-scripts allow-popups" title="Web Development Essentials course video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Web Development Essentials</h3>
+										<p>HTML, CSS, and JavaScript for modern web apps</p>
+										<small>12 videos • 6 hours</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/RVFAyFWO4go" frameborder="0" sandbox="allow-scripts allow-popups" title="Data Structures and Algorithms course video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Data Structures & Algorithms</h3>
+										<p>Master advanced programming concepts</p>
+										<small>15 videos • 8 hours</small>
+									</div>
+								</div>
+								<div class="video-card">
+									<div class="video-thumbnail">
+										<iframe width="100%" height="200" data-src="https://www.youtube.com/embed/7S_tz1z_5bA" frameborder="0" sandbox="allow-scripts allow-popups" title="Database Management with SQL course video"></iframe>
+									</div>
+									<div class="video-info">
+										<h3>Database Management with SQL</h3>
+										<p>SQL and database design principles</p>
+										<small>10 videos • 5 hours</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+
+
+	<script src="script.js"></script>
+	<!-- Load Tracks from API -->
+	<script>
+		// Load tracks from the backend API when page loads
+		async function loadTracksFromAPI() {
+			try {
+				const response = await fetch('/api/tracks');
+				if (!response.ok) {
+					console.error('Failed to load tracks:', response.status);
+					return;
+				}
+				
+				const result = await response.json();
+				const tracks = result.data || result.tracks || [];
+				const trackSelect = document.getElementById('register-track');
+				
+				if (!trackSelect) {
+					console.warn('Track select element not found');
+					return;
+				}
+				
+				// Clear existing options except the first one
+				while (trackSelect.options.length > 1) {
+					trackSelect.remove(1);
+				}
+				
+				// Add tracks to dropdown
+				tracks.forEach(track => {
+					const option = document.createElement('option');
+					option.value = track.code;
+					const price = track.prices ? track.prices['1-year'] : 'N/A';
+					option.textContent = `${track.name} - $${price}`;
+					option.dataset.trackId = track.id;
+
+					option.dataset.price1year = track.prices ? track.prices['1-year'] : 0;
+					trackSelect.appendChild(option);
+				});
+				
+				console.log('✓ Tracks loaded successfully:', tracks.length, 'tracks');
+			} catch (error) {
+				console.error('Error loading tracks from API:', error);
+				// Fallback to hardcoded options if API fails
+				console.log('Using fallback hardcoded tracks');
+			}
+		}
+		
+		// Call when DOM is ready
+		document.addEventListener('DOMContentLoaded', function() {
+			// Small delay to ensure server is ready
+			setTimeout(loadTracksFromAPI, 500);
+		});
+		
+		// Also try loading immediately if DOM is already loaded
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', loadTracksFromAPI);
+		} else {
+			loadTracksFromAPI();
+		}
+	</script>
+	<!-- WebGL Context Cleanup and Iframe Management -->
+	<script>
+		// Cleanup function to prevent WebGL context leak
+		function cleanupWebGLContexts() {
+			const iframes = document.querySelectorAll('iframe');
+			iframes.forEach(iframe => {
+				try {
+					// Stop iframe content
+					iframe.src = 'about:blank';
+				} catch (e) {
+					// Silently handle any errors
+				}
+			});
+		}
+
+		// Clean up before page unload (live reload)
+		window.addEventListener('beforeunload', cleanupWebGLContexts);
+
+		// Implement lazy loading for iframes to reduce memory usage
+		function implementLazyLoadingForIframes() {
+			const iframes = document.querySelectorAll('iframe[data-src]');
+			
+			if ('IntersectionObserver' in window) {
+				const iframeObserver = new IntersectionObserver((entries, observer) => {
+					entries.forEach(entry => {
+						if (entry.isIntersecting) {
+							const iframe = entry.target;
+							iframe.src = iframe.getAttribute('data-src');
+							iframe.removeAttribute('data-src');
+							observer.unobserve(iframe);
+						}
+					});
+				}, {
+					rootMargin: '50px'
+				});
+
+				iframes.forEach(iframe => iframeObserver.observe(iframe));
+			} else {
+				// Fallback for older browsers - load all immediately
+				iframes.forEach(iframe => {
+					if (iframe.hasAttribute('data-src')) {
+						iframe.src = iframe.getAttribute('data-src');
+						iframe.removeAttribute('data-src');
+					}
+				});
+			}
+		}
+
+		// Initialize lazy loading when DOM is ready
+		document.addEventListener('DOMContentLoaded', implementLazyLoadingForIframes);
+
+		// Additional cleanup on visibility change
+		document.addEventListener('visibilitychange', function() {
+			if (document.hidden) {
+				// Page is hidden - pause iframes
+				const iframes = document.querySelectorAll('iframe');
+				iframes.forEach(iframe => {
+					try {
+						const src = iframe.src;
+						if (src && src.includes('youtube')) {
+							// YouTube iframes will pause automatically, but we can unload them
+							iframe.style.display = 'none';
+						}
+					} catch (e) {
+						// Handle errors silently
+					}
+				});
+			} else {
+				// Page is visible again - restore iframes
+				const iframes = document.querySelectorAll('iframe');
+				iframes.forEach(iframe => {
+					if (iframe.style.display === 'none') {
+						iframe.style.display = '';
+					}
+				});
+			}
+		});
+	</script>
+</body>
+</html>
+
+

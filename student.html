@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - APKL</title>
+    <link rel="stylesheet" href="admin-dashboard/style.css">
+    <style>
+        /* Polished class-view styles for student video/screen */
+        #student-class-view { font-family: Inter, Arial, Helvetica, sans-serif; color: #fff; }
+        #student-class-view > div:first-child { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding: 14px 18px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+        #student-class-view h2 { margin:0; font-size:18px; }
+        #student-class-view p { margin:0; opacity:0.95; font-size:13px; }
+        #close-class-btn { background: rgba(255,255,255,0.12); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:18px; }
+
+        #class-content { flex:1; display:flex; align-items:center; justify-content:center; background: #000; overflow:auto; position: relative; }
+        #teacher-screen-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+        #teacher-screen-img { max-width:100%; max-height:100%; object-fit:contain; display:none; border-radius:8px; box-shadow: 0 12px 40px rgba(2,6,23,0.6); }
+        #waiting-message { text-align:center; color:#9aa3b2; padding: 40px; }
+
+        /* Control bar */
+        #student-class-view > div:last-child { background: #1f2937; padding:12px 18px; display:flex; justify-content:center; gap:12px; border-top: 1px solid rgba(255,255,255,0.03); }
+        #student-leave-btn { padding:10px 20px; background: linear-gradient(90deg,#ef4444,#dc2626); color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
+
+        /* Remote teacher video element inserted dynamically */
+        #teacher-remote-video { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; box-shadow:0 10px 30px rgba(2,6,23,0.6); }
+
+        @media (max-width: 700px) {
+            #student-class-view > div:first-child { padding: 10px 12px; }
+            #student-class-view h2 { font-size: 16px; }
+            #student-leave-btn { padding: 8px 14px; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>APKL Student</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <span class="icon">🏠</span> Dashboard
+                    </a></li>
+                    <li><a href="#class-activities" class="nav-link" data-section="class-activities">
+                        <span class="icon">📚</span> Class Activities
+                    </a></li>
+                    <li><a href="#notification" class="nav-link" data-section="notification">
+                        <span class="icon">🔔</span> Notification
+                    </a></li>
+                    <li><a href="#programming-lab" class="nav-link" data-section="programming-lab">
+                        <span class="icon">💻</span> Programming Lab
+                    </a></li>
+                    <li><a href="#library" class="nav-link" data-section="library">
+                        <span class="icon">📖</span> Library
+                    </a></li>
+                    <li><a href="#" class="nav-link logout" id="logout-btn">
+                        <span class="icon">🚪</span> Logout
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <h1 id="page-title">Dashboard</h1>
+                    <div class="top-bar-right">
+                    <input type="search" class="search-box" placeholder="Search...">
+                        <div class="user-profile">
+                        <span id="user-name">John Doe</span>
+                        <div id="user-avatar" class="user-avatar">👤</div>
+                    </div>
+                        <div class="track-selector">
+                            <label class="track-label">Track:</label>
+                            <div id="track-display" class="track-display">Assigned: —</div>
+                        </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content-wrapper">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="content-section active">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <h3>Class Activities</h3>
+                                <p class="stat-value" id="activities-count">3</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔔</div>
+                            <div class="stat-info">
+                                <h3>Notifications</h3>
+                                <p class="stat-value" id="notifications-count">12</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💻</div>
+                            <div class="stat-info">
+                                <h3>Programming Lab</h3>
+                                <p class="stat-value" id="lab-progress">24/50</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📖</div>
+                            <div class="stat-info">
+                                <h3>Library</h3>
+                                <p class="stat-value" id="library-count">15</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Class Activities Section -->
+                    <div class="section-panel">
+                        <h3>Class Activities</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Instructor</th>
+                                        <th>Schedule</th>
+                                        <th>Students</th>
+                                        <th>Track</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-activities">
+                                    <!-- Will be populated from selected courses -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Class Activities Full Section -->
+                <section id="class-activities-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Class Activities</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Instructor</th>
+                                        <th>Schedule</th>
+                                        <th>Students</th>
+                                        <th>Track</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="full-class-activities">
+                                    <!-- Will be populated from selected courses -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Notification Section -->
+                <section id="notification-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Notifications</h3>
+                        <div class="notification-content">
+                            <div class="notification-item">
+                                <div class="notification-icon">📢</div>
+                                <div class="notification-details">
+                                    <h4>New Assignment Posted</h4>
+                                    <p>Database Systems: Assignment 3 has been posted</p>
+                                    <span class="notification-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon">🔔</div>
+                                <div class="notification-details">
+                                    <h4>Class Rescheduled</h4>
+                                    <p>OOP class has been rescheduled to 3:00 PM tomorrow</p>
+                                    <span class="notification-time">5 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon">✅</div>
+                                <div class="notification-details">
+                                    <h4>Grade Published</h4>
+                                    <p>Your grade for Web Development Project has been published</p>
+                                    <span class="notification-time">1 day ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Programming Lab Section -->
+                <section id="programming-lab-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Programming Lab</h3>
+                        <div class="lab-content">
+                            <div class="lab-item">
+                                <h4>💻 Live Coding Session</h4>
+                                <p>Join our weekly live coding sessions every Friday at 4:00 PM</p>
+                                <p><strong>Next session:</strong> 2026-02-01</p>
+                                <button class="btn btn-primary" id="join-lab">Join Lab</button>
+                            </div>
+                            <div class="lab-item">
+                                <h4>🚀 Practice Problems</h4>
+                                <p>Solve daily coding challenges and improve your programming skills</p>
+                                <p><strong>Difficulty:</strong> Beginner - Advanced</p>
+                                <button class="btn btn-primary" id="start-practice">Start Practice</button>
+                            </div>
+                            <div class="lab-item">
+                                <h4>📊 Progress Tracking</h4>
+                                <p>View your lab completion rate and coding statistics</p>
+                                <p><strong>Completed:</strong> 24 / 50 exercises</p>
+                                <button class="btn btn-primary" id="view-progress">View Progress</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Library Section -->
+                <section id="library-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Library</h3>
+                        <div class="library-content">
+                            <div class="library-item">
+                                <h4>📖 Course Materials</h4>
+                                <ul id="course-materials">
+                                    <li><a href="#">OOP Lecture Notes - Chapter 5</a></li>
+                                    <li><a href="#">Database Design Patterns</a></li>
+                                    <li><a href="#">Web Dev Best Practices 2026</a></li>
+                                    <li><a href="#">Python Algorithm Guide</a></li>
+                                </ul>
+                            </div>
+                            <div class="library-item">
+                                <h4>📚 Reference Books</h4>
+                                <ul id="reference-books">
+                                    <li><a href="#">Clean Code: A Handbook of Agile Software Craftsmanship</a></li>
+                                    <li><a href="#">Design Patterns: Elements of Reusable Object-Oriented Software</a></li>
+                                    <li><a href="#">The Pragmatic Programmer</a></li>
+                                </ul>
+                            </div>
+                            <div class="library-item">
+                                <h4>🔗 External Resources</h4>
+                                <ul id="external-resources">
+                                    <li><a href="#">Stack Overflow</a></li>
+                                    <li><a href="#">GitHub Repository</a></li>
+                                    <li><a href="#">MDN Web Docs</a></li>
+                                    <li><a href="#">Dev Community</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // API URL configuration
+        const API_URL = window.appConfig?.API_URL || 'http://127.0.0.1:5002';
+        
+        // Clear old session data but check for active teacher class
+        sessionStorage.removeItem('activeClassSession');
+        sessionStorage.removeItem('currentMeetingId');
+        
+        // Get user data from localStorage
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        const userToken = localStorage.getItem('userToken');
+        const bucodeSetup = JSON.parse(localStorage.getItem('bucodel_setup') || 'null');
+
+        // Check if user is logged in with approved payment (only redirect once)
+        if (!(userData.userId || userData.id) || (!userToken && !bucodeSetup)) {
+            // Only redirect if we're not already redirecting (prevent loop)
+            const redirected = sessionStorage.getItem('student_redirect_check');
+            if (!redirected) {
+                sessionStorage.setItem('student_redirect_check', 'true');
+                console.log('❌ User not authenticated. Redirecting to login...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 500);
+            }
+        } else {
+            // Clear redirect flag once authenticated
+            sessionStorage.removeItem('student_redirect_check');
+            
+            // Check if teacher has an active class - auto-join if so
+            const activeTeacherClass = JSON.parse(localStorage.getItem('activeTeacherClass') || 'null');
+            if (activeTeacherClass && activeTeacherClass.meetingId) {
+                console.log('🔔 Teacher has active class! Auto-joining:', activeTeacherClass.meetingId);
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        joinVideoClass(activeTeacherClass.meetingId, activeTeacherClass.courseCode, activeTeacherClass.courseCode);
+                    }, 1000);
+                });
+            }
+        }
+
+        // Navigation switching functionality
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const pageTitle = document.getElementById('page-title');
+
+        // Navigation titles mapping
+        const navigationTitles = {
+            'dashboard': 'Dashboard',
+            'class-activities': 'Class Activities',
+            'notification': 'Notification',
+            'programming-lab': 'Programming Lab',
+            'library': 'Library'
+        };
+
+        // Add click handlers to navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (link.classList.contains('logout')) {
+                    handleLogout();
+                    return;
+                }
+
+                e.preventDefault();
+
+                // Get section name
+                const sectionName = link.getAttribute('data-section');
+                if (!sectionName) return;
+
+                // Remove active class from all links
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Hide all sections
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                // Show selected section
+                const selectedSection = document.getElementById(`${sectionName}-section`);
+                if (selectedSection) {
+                    selectedSection.classList.add('active');
+                    pageTitle.textContent = navigationTitles[sectionName] || 'Dashboard';
+                }
+
+                // Update URL
+                window.history.pushState(null, null, `#${sectionName}`);
+            });
+        });
+
+        // Load student's track information from Supabase
+        async function loadStudentTrackInfo() {
+            try {
+                // Wait for supabaseHelpers to be available
+                let attempts = 0;
+                while (!window.supabaseHelpers && attempts < 50) {
+                    await new Promise(r => setTimeout(r, 100));
+                    attempts++;
+                }
+
+                if (!window.supabaseHelpers) {
+                    console.warn('⚠️ Supabase helpers not available, skipping track info');
+                    return;
+                }
+
+                // Fetch all tracks from Supabase
+                const tracks = await window.supabaseHelpers.fetchTracksFromSupabase();
+                
+                if (tracks.length > 0) {
+                    // Store tracks globally for reference
+                    window.studentTracks = tracks;
+                    console.log('✅ Tracks loaded for student:', tracks.map(t => t.name).join(', '));
+                    
+                    // If student has a track assigned, display it
+                    if (userData.track) {
+                        const studentTrack = tracks.find(t => t.code === userData.track);
+                        if (studentTrack) {
+                            console.log('📚 Student Track:', studentTrack.name);
+                        }
+                    }
+                } else {
+                    console.warn('⚠️ No tracks available from Supabase');
+                }
+            } catch (error) {
+                console.error('Error loading student track info:', error);
+            }
+        }
+
+        // Initialize page
+        function initPage() {
+            // Check if user data exists (allows page to load even without userToken initially)
+            if (!(userData.userId || userData.id) && !bucodeSetup) {
+                console.log('⚠️ No user data found');
+                return;
+            }
+
+            // Set user name and avatar
+            const userName = userData.name || 'Student';
+            document.getElementById('user-name').textContent = userName;
+            document.getElementById('user-avatar').textContent = userData.initials || 'JD';
+
+            // Load student's track information from Supabase
+            loadStudentTrackInfo();
+
+            // Render track selector and load courses for selected track
+            renderTrackSelector().then(() => {
+                loadCoursesForSelectedTrack();
+            });
+
+            // Connect to WebSocket for real-time updates (only if userId exists)
+            if (userData.userId) {
+                connectWebSocket();
+            }
+
+            // Setup all button handlers
+            setupClassActivities();
+            setupLabButtons();
+            setupLibraryLinks();
+        }
+
+        function loadDashboardData() {
+            const studentData = JSON.parse(localStorage.getItem('studentData') || '{}');
+            const studentTrack = studentData.track || userData.track || 'webdev';
+            
+            // Deprecated: use loadCoursesForSelectedTrack instead
+            loadCoursesForSelectedTrack();
+        }
+
+        // Load courses using only the user's registered track (no manual override)
+        function loadCoursesForSelectedTrack() {
+            const studentData = JSON.parse(localStorage.getItem('studentData') || '{}');
+            const assigned = studentData.track || userData.track || '';
+
+            // If assigned track exists, use it; otherwise use empty to attempt API local retrieval
+            loadCoursesFromAPI(assigned);
+        }
+
+        // Render the assigned track in the top bar (read-only). Only the registered track will be used to load courses.
+        async function renderTrackSelector() {
+            const display = document.getElementById('track-display');
+            if (!display) return;
+
+            const studentData = JSON.parse(localStorage.getItem('studentData') || '{}');
+            const assigned = studentData.track || userData.track || null;
+
+            // Check where the track comes from
+            console.log('📍 Track Assignment Debug:');
+            console.log('  - studentData.track:', studentData.track);
+            console.log('  - userData.track:', userData.track);
+            console.log('  - Final assigned:', assigned);
+
+            // Display the track name or helpful message
+            if (assigned) {
+                display.textContent = assigned;
+                console.log(`✅ Track assigned: ${assigned}`);
+            } else {
+                display.textContent = 'Not assigned';
+                display.style.color = '#ff6b6b';
+                console.warn('⚠️ No track assigned to this student. Please contact admin or register with a track.');
+            }
+
+            // Ensure selection storage reflects auto behavior (for backward compatibility)
+            localStorage.setItem('selectedTrack', '__auto__');
+        }
+
+        // Load courses from API based on track
+        async function loadCoursesFromAPI(track) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5002/api/courses?track=${track}`);
+                const data = await response.json();
+                
+                if (!data.success || !data.courses) {
+                    console.error('Failed to fetch courses:', data);
+                    // If API doesn't provide courses, try local courses.json
+                    loadCoursesFromLocalJSON(track);
+                    return;
+                }
+
+                const courses = data.courses;
+                
+                // Update activities count
+                document.getElementById('activities-count').textContent = courses.length;
+                document.getElementById('notifications-count').textContent = '12';
+                document.getElementById('lab-progress').textContent = '24/50';
+                document.getElementById('library-count').textContent = '15';
+
+                // Populate dashboard activities table
+                populateCoursesTable('dashboard-activities', courses);
+                
+                // Populate full class activities section
+                populateCoursesTable('full-class-activities', courses);
+            } catch (error) {
+                console.error('Error loading courses from API:', error);
+                // On network/API error, try loading local courses.json
+                loadCoursesFromLocalJSON(track);
+            }
+        }
+
+        // Normalize track names for matching (e.g., 'webdev' -> 'web-dev')
+        function normalizeTrack(track) {
+            if (!track) return '';
+            const t = String(track).toLowerCase().trim();
+            if (t.includes('-')) return t;
+            // Insert hyphen between words (web dev -> web-dev), also handle camelCase
+            return t.replace(/\s+/g, '-').replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-z0-9-]/g, '');
+        }
+
+        function matchesTrack(courseTrack, studentTrack) {
+            if (!courseTrack || !studentTrack) return false;
+            const c = String(courseTrack).toLowerCase();
+            const s = normalizeTrack(studentTrack);
+            // exact or contains or vice versa
+            return c === s || c.includes(s) || s.includes(c) || c.replace(/\s+/g, '-') === s;
+        }
+
+        // Load courses from local courses.json and filter by track
+        async function loadCoursesFromLocalJSON(track) {
+            try {
+                const resp = await fetch('courses.json');
+                if (!resp.ok) throw new Error('Failed to fetch local courses.json');
+                const json = await resp.json();
+                const allCourses = Array.isArray(json.courses) ? json.courses : json;
+
+                const filtered = allCourses.filter(c => matchesTrack(c.track, track));
+
+                // If no exact matches, try a looser match by checking if track appears inside course.track
+                let coursesToShow = filtered;
+                if (coursesToShow.length === 0 && track) {
+                    const s = normalizeTrack(track);
+                    coursesToShow = allCourses.filter(c => String(c.track).toLowerCase().includes(s) || s.includes(String(c.track).toLowerCase()));
+                }
+
+                // Update counts and populate tables
+                document.getElementById('activities-count').textContent = coursesToShow.length;
+                document.getElementById('notifications-count').textContent = '12';
+                document.getElementById('lab-progress').textContent = '24/50';
+                document.getElementById('library-count').textContent = '15';
+
+                populateCoursesTable('dashboard-activities', coursesToShow);
+                populateCoursesTable('full-class-activities', coursesToShow);
+            } catch (err) {
+                console.error('Error loading local courses.json:', err);
+                // Last-resort fallback to embedded setup data
+                loadFallbackCourses();
+            }
+        }
+
+        // Fallback to sample data if API fails
+        function loadFallbackCourses() {
+            const setupData = userData.setupData || {};
+            const courses = setupData.courses || [];
+
+            document.getElementById('activities-count').textContent = courses.length;
+            document.getElementById('notifications-count').textContent = '12';
+            document.getElementById('lab-progress').textContent = '24/50';
+            document.getElementById('library-count').textContent = '15';
+
+            // Populate dashboard activities table with old function
+            populateActivitiesTable('dashboard-activities', courses);
+            
+            // Populate full class activities section
+            populateActivitiesTable('full-class-activities', courses);
+        }
+
+        // Populate courses table from API data
+        function populateCoursesTable(tableId, courses) {
+            const tbody = document.getElementById(tableId);
+            if (!tbody) return;
+
+            tbody.innerHTML = ''; // Clear existing rows
+
+            if (!courses || courses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999; padding: 30px;">No courses available for your track</td></tr>';
+                return;
+            }
+
+            // Display each course as a row with all details from courses.json
+            courses.forEach(course => {
+                const createdDate = new Date(course.created_at).toLocaleDateString();
+                const updatedDate = new Date(course.updated_at).toLocaleDateString();
+                const trackClass = `track-badge ${(course.track || '').toLowerCase().replace(/\s+/g, '-')}`;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${course.id || 'N/A'}</td>
+                    <td><strong>${course.code}</strong></td>
+                    <td>${course.name}</td>
+                    <td>${course.description || 'N/A'}</td>
+                    <td>${course.instructor || 'N/A'}</td>
+                    <td><span class="status-badge active">${course.schedule || 'TBD'}</span></td>
+                    <td><strong>${course.students || 0}</strong></td>
+                    <td><span class="${trackClass}">${course.track || 'N/A'}</span></td>
+                    <td>${createdDate}</td>
+                    <td>${updatedDate}</td>
+                    <td><button class="btn-small btn-start" data-course-code="${course.code}" data-course-name="${course.name}">Start</button></td>
+                `;
+                tbody.appendChild(row);
+
+                // After adding the row, update the Start button label with schedule info from server
+                try {
+                    const startBtn = row.querySelector('.btn-start');
+                    if (startBtn) fetchAndUpdateStartButton(course.code, startBtn);
+                } catch (e) {
+                    console.warn('Failed to update start button label for', course.code, e);
+                }
+            });
+
+            // Re-setup activity button handlers
+            setupClassActivities();
+        }
+
+        // Fetch schedule for a course and update the Start button label accordingly
+        async function fetchAndUpdateStartButton(courseCode, btn) {
+            try {
+                const API_URL = window.appConfig?.API_URL || 'http://127.0.0.1:5002';
+                // Use server check to determine if students can join now (prevents joining before teacher clicks Start)
+                // First, get the schedule to attach meetingId if present
+                let meetingId = btn.dataset.meetingId || null;
+                try {
+                    const schedResp = await fetch(`${API_URL}/api/class/schedule/${encodeURIComponent(courseCode)}`);
+                    if (schedResp.ok) {
+                        const schedData = await schedResp.json().catch(()=>({}));
+                        if (schedData && Array.isArray(schedData.schedules) && schedData.schedules.length > 0) {
+                            const now = new Date();
+                            const schedules = schedData.schedules.sort((a,b) => new Date(`${a.startDate}T${a.startTime}`) - new Date(`${b.startDate}T${b.startTime}`));
+                            const chosen = schedules.find(s => new Date(`${s.startDate}T${s.startTime}`) >= now) || schedules[0];
+                            if (chosen && chosen.meetingId) meetingId = chosen.meetingId;
+                        }
+                    }
+                } catch (e) { /* ignore */ }
+
+                // If no meetingId available, disable join (no scheduled class)
+                if (!meetingId) {
+                    btn.textContent = 'Start';
+                    btn.title = 'No scheduled class';
+                    btn.disabled = true;
+                    return;
+                }
+
+                // Ask server if student can join now
+                try {
+                    const checkResp = await fetch(`${API_URL}/api/class/check-join-time`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ courseCode: courseCode, meetingId: meetingId })
+                    });
+                    const checkData = await checkResp.json().catch(()=>({}));
+                    if (checkResp.ok && checkData && checkData.canJoin) {
+                        btn.textContent = 'Join Now';
+                        btn.title = 'Class is active - click to join';
+                        btn.disabled = false;
+                        btn.dataset.meetingId = meetingId;
+                        return;
+                    }
+                    // Not allowed to join yet
+                    btn.textContent = 'Waiting for teacher...';
+                    btn.title = checkData.message || 'Waiting for teacher to start the class';
+                    btn.disabled = true;
+                } catch (err) {
+                    console.error('Error checking join status:', err);
+                }
+            } catch (err) {
+                console.error('Error fetching schedule for', courseCode, err);
+            }
+        }
+
+        // Update UI when teacher starts class (called via WebSocket message)
+        function updateStudentUiOnClassStarted(courseCode) {
+            // Mark class as started in localStorage
+            localStorage.setItem(`class_started_${courseCode}`, 'true');
+
+            // Find and update all Start buttons for this course
+            const startButtons = document.querySelectorAll('.btn-start');
+            startButtons.forEach(btn => {
+                if (btn.dataset.courseCode === courseCode) {
+                    btn.textContent = 'Join Now';
+                    btn.title = 'Class is active - click to join';
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // Update UI when teacher ends class (called via WebSocket message)
+        function updateStudentUiOnClassEnded(courseCode) {
+            // Mark class as ended in localStorage
+            localStorage.setItem(`class_started_${courseCode}`, 'false');
+
+            // Clear active student class if it matches
+            const activeClass = JSON.parse(localStorage.getItem('activeStudentClass') || 'null');
+            if (activeClass && activeClass.courseCode === courseCode) {
+                localStorage.removeItem('activeStudentClass');
+            }
+
+            // Find and update all Start buttons for this course
+            const startButtons = document.querySelectorAll('.btn-start');
+            startButtons.forEach(btn => {
+                if (btn.dataset.courseCode === courseCode) {
+                    btn.textContent = 'Start';
+                    btn.title = 'Class has ended';
+                    btn.disabled = true;
+                }
+            });
+
+            // If student currently has the class view open, close it and clean up
+            try {
+                const view = document.getElementById('student-class-view') || window._studentClassView || null;
+                if (view) {
+                    // Stop monitor interval if set
+                    try { if (window._studentMonitorInterval) { clearInterval(window._studentMonitorInterval); delete window._studentMonitorInterval; } } catch (e) {}
+                    // Stop any captured media tracks
+                    try { if (window._studentStream) { window._studentStream.getTracks().forEach(t=>t.stop()); delete window._studentStream; } } catch (e) {}
+                    // Also stop local student capture if present
+                    try { if (window.studentLocalStream) { window.studentLocalStream.getTracks().forEach(t=>t.stop()); delete window.studentLocalStream; } } catch (e) {}
+
+                    // Remove the DOM view
+                    try { view.remove(); } catch (e) {}
+
+                    // Clean stored active flag
+                    try { localStorage.removeItem('activeStudentClass'); } catch (e) {}
+
+                    // Notify the user briefly
+                    try { alert('✅ Class has ended. Returning to the dashboard.'); } catch (e) {}
+                }
+            } catch (e) { console.warn('Error cleaning student class view on end:', e); }
+        }
+
+        // Sample activities data for each course
+        const courseActivitiesMap = {
+            'CS101': [
+                { activity: 'Assignment 1 posted', date: '2026-01-25', action: 'Open' },
+                { activity: 'Quiz 1 available', date: '2026-01-28', action: 'Take' }
+            ],
+            'CS102': [
+                { activity: 'Lab assignment 2', date: '2026-01-30', action: 'Open' },
+                { activity: 'Midterm exam scheduled', date: '2026-02-10', action: 'View' }
+            ],
+            'CS201': [
+                { activity: 'Database design project', date: '2026-02-05', action: 'Submit' },
+                { activity: 'Peer review due', date: '2026-02-15', action: 'Review' }
+            ],
+            'OOP': [
+                { activity: 'Live session scheduled', date: '2026-02-01', action: 'Join' },
+                { activity: 'Assignment 2 posted', date: '2026-01-30', action: 'Open' }
+            ],
+            'Web Development': [
+                { activity: 'Project submission deadline', date: '2026-02-05', action: 'Submit' },
+                { activity: 'Code review session', date: '2026-02-08', action: 'Attend' }
+            ],
+            'Database Systems': [
+                { activity: 'Assignment 2 posted', date: '2026-01-30', action: 'Open' },
+                { activity: 'SQL challenge', date: '2026-02-03', action: 'Participate' }
+            ]
+        };
+
+        function populateActivitiesTable(tableId, courses) {
+            const tbody = document.getElementById(tableId);
+            if (!tbody) return;
+
+            tbody.innerHTML = ''; // Clear existing rows
+
+            if (!courses || courses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No courses selected</td></tr>';
+                return;
+            }
+
+            // First, get class sessions from teacher's sent classes
+            const studentData = JSON.parse(localStorage.getItem('studentData') || '{}');
+            const studentId = studentData.id;
+            const classActivities = JSON.parse(localStorage.getItem('student_activities_' + studentId) || '[]');
+            
+            let hasActivities = false;
+
+            // Generate activities for selected courses
+            courses.forEach(course => {
+                const courseName = course.name || course.code;
+                const courseKey = course.code || course.name;
+                
+                // Check for class sessions from teacher
+                const courseSessions = classActivities.filter(a => a.course === courseKey);
+                
+                // Get generic activities for this course
+                const genericActivities = courseActivitiesMap[courseKey] || courseActivitiesMap[courseName] || [
+                    { activity: 'Assignment posted', date: '2026-01-30', action: 'Open' },
+                    { activity: 'Live session', date: '2026-02-01', action: 'Join' }
+                ];
+                
+                // Add class sessions first
+                courseSessions.forEach(session => {
+                    hasActivities = true;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${courseName}</td>
+                        <td>📹 ${session.title}</td>
+                        <td>${session.date} ${session.time}</td>
+                        <td><button class="btn-small btn-video" data-meeting-id="${session.meetingId}" data-course-code="${courseKey}" data-course-name="${courseName}">Join</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Then add generic activities
+                genericActivities.forEach(activity => {
+                    hasActivities = true;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${courseName}</td>
+                        <td>${activity.activity}</td>
+                        <td>${activity.date}</td>
+                        <td><button class="btn-small btn-view">${activity.action}</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+            
+            if (!hasActivities) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No activities available</td></tr>';
+            }
+
+            // Re-setup activity button handlers
+            setupClassActivities();
+        }
+
+        function setupClassActivities() {
+            const activityButtons = document.querySelectorAll('.btn-small');
+            activityButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const row = e.target.closest('tr');
+                    if (row) {
+                        const course = row.cells[0].textContent;
+                        const activity = row.cells[1].textContent;
+                        
+                        // Check if this is a video class join button
+                        if (btn.classList.contains('btn-video')) {
+                            const meetingId = btn.dataset.meetingId;
+                            const courseCode = btn.dataset.courseCode;
+                            const courseName = btn.dataset.courseName;
+                            joinVideoClass(meetingId, courseCode, courseName);
+                        } else {
+                            alert(`${btn.textContent} - ${course}: ${activity}`);
+                        }
+                    }
+                });
+            });
+
+            // Handle Start button clicks
+            const startButtons = document.querySelectorAll('.btn-start');
+            startButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const courseCode = btn.dataset.courseCode;
+                    const courseName = btn.dataset.courseName;
+                    startCourse(courseCode, courseName);
+                });
+            });
+        }
+
+        // Start course - handles course activation
+        async function startCourse(courseCode, courseName) {
+            try {
+                const API_URL = window.appConfig?.API_URL || 'http://127.0.0.1:5002';
+
+                // First fetch schedule(s) for this course from server
+                const schedResp = await fetch(`${API_URL}/api/class/schedule/${encodeURIComponent(courseCode)}`);
+                let schedules = [];
+                if (schedResp.ok) {
+                    const schedData = await schedResp.json();
+                    if (schedData.success && Array.isArray(schedData.schedules)) {
+                        schedules = schedData.schedules;
+                    }
+                }
+
+                if (!schedules || schedules.length === 0) {
+                    alert('No scheduled class found for this course. Please check with your instructor.');
+                    return;
+                }
+
+                // Pick the next upcoming schedule (first with startDate >= today) or the first one
+                const now = new Date();
+                let chosen = schedules.find(s => new Date(`${s.startDate}T${s.startTime}`) >= now) || schedules[0];
+
+                // Ask server whether student can join now
+                const checkResp = await fetch(`${API_URL}/api/class/check-join-time`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ courseCode: courseCode, meetingId: chosen.meetingId })
+                });
+
+                const checkData = await checkResp.json();
+                if (!checkResp.ok) {
+                    alert('Error checking class time: ' + (checkData.message || checkResp.statusText));
+                    return;
+                }
+
+                if (checkData.canJoin) {
+                    // Save current course state and proceed to join
+                    const currentCourse = { code: courseCode, name: courseName, meetingId: chosen.meetingId, startedAt: new Date().toISOString(), status: 'active' };
+                    localStorage.setItem('currentCourse', JSON.stringify(currentCourse));
+                    alert(`✅ Joining class now:\n\n${courseName} (${courseCode})`);
+                    joinVideoClass(chosen.meetingId, courseCode, courseName);
+                    return;
+                }
+
+                // Not allowed to join yet; show wait info
+                if (checkData.status === 'waiting') {
+                    alert(`⏳ ${checkData.message} (Starts at ${checkData.scheduledTime}).\nPlease wait ${checkData.waitTime}.`);
+                    return;
+                }
+
+                if (checkData.status === 'ended') {
+                    alert('This class has already ended.');
+                    return;
+                }
+
+                // Fallback
+                alert(checkData.message || 'Unable to join class at this time.');
+
+            } catch (error) {
+                console.error('Error starting course via server:', error);
+                alert('Failed to start course. Please try again.');
+            }
+        }
+        
+        // Join video class (server-integrated)
+        async function joinVideoClass(meetingId, courseCode, courseName) {
+            try {
+                // Get student info
+                const studentData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const studentId = studentData.userId || studentData.id || 'anonymous';
+                
+                // Persist active student class state
+                localStorage.setItem('activeStudentClass', JSON.stringify({
+                    meetingId: meetingId,
+                    courseCode: courseCode,
+                    courseName: courseName,
+                    joinedAt: new Date().toISOString()
+                }));
+
+                // Request camera and microphone permissions (optional)
+                let stream = null;
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: true });
+                    console.log('✅ Camera/microphone access granted');
+                } catch (mediaError) {
+                    console.warn('⚠️ Camera/microphone not available, continuing without them:', mediaError.message);
+                }
+                
+                // Notify server that student is joining
+                try {
+                    const response = await fetch(`${API_URL}/api/classes/join`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ meetingId, studentId, courseCode })
+                    });
+                    const data = await response.json().catch(()=>({}));
+                    if (!data.success) {
+                        console.warn('⚠️ Class not active on server:', data.message || 'no response');
+                        alert('Class is not currently active. Please try again later.');
+                        return;
+                    } else {
+                        console.log('✅ Joined class on server');
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Could not connect to server:', err.message);
+                }
+
+                // Announce presence to WebSocket for signaling (so others will offer to us)
+                try {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'join_meeting', meetingId, userId: studentId, displayName: studentData.name || studentData.email || 'Student' }));
+                    }
+                } catch (e) { console.warn('Could not announce join_meeting via WS', e.message); }
+
+                // Create a full class view interface
+                const classView = document.createElement('div');
+                classView.id = 'student-class-view';
+                classView.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; display: flex; flex-direction: column; z-index: 9999; font-family: Arial, sans-serif; color: white;`;
+                classView.innerHTML = `
+                    <!-- Class Header -->
+                    <div style="
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        padding: 15px 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+                    ">
+                        <div>
+                            <h2 style="margin: 0; font-size: 18px;">${courseName} (${courseCode}) - Live Class</h2>
+                            <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.9;">Meeting ID: ${meetingId}</p>
+                        </div>
+                        <button id="close-class-btn" style="
+                            background: rgba(255, 255, 255, 0.2);
+                            color: white;
+                            border: none;
+                            padding: 8px 12px;
+                            border-radius: 6px;
+                            font-size: 20px;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                        ">✕</button>
+                    </div>
+
+                    <!-- Video/Screen Area -->
+                    <div style="
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: #000;
+                        position: relative;
+                        overflow: auto;
+                    " id="class-content">
+                        <div id="teacher-screen-container" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+                            <img id="teacher-screen-img" src="" alt="Teacher Screen" style="max-width:100%; max-height:100%; object-fit:contain; display:none;" />
+                            <div id="waiting-message" style="
+                                text-align: center;
+                                color: #999;
+                                padding: 40px;
+                            ">
+                                <div style="font-size: 80px; margin-bottom: 20px;">🎬</div>
+                                <p style="font-size: 20px; margin: 0 0 10px 0;">Waiting for teacher...</p>
+                                <p style="font-size: 14px; margin: 0; opacity: 0.7;">Teacher will share their video or screen here</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Control Bar -->
+                    <div style="
+                        background: #2a2a2a;
+                        padding: 15px 20px;
+                        display: flex;
+                        justify-content: center;
+                        gap: 10px;
+                        border-top: 1px solid #444;
+                        flex-wrap: wrap;
+                    ">
+                        <button id="student-leave-btn" style="
+                            padding: 10px 20px;
+                            background: #ff6b6b;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        ">Leave Class</button>
+                    </div>
+                `;
+                document.body.appendChild(classView);
+
+                // Expose handles globally so other parts (WS handlers) can clean up when teacher ends class
+                try {
+                    window._studentClassView = classView;
+                    window._studentStream = stream || null;
+                } catch (e) {}
+
+                // Monitor class status on server
+                let lastScreenShareState = null;
+                const monitorClassStatus = setInterval(async () => {
+                    try {
+                        const response = await fetch(`${API_URL}/api/classes/active/${meetingId}`);
+                        const data = await response.json().catch(()=>({}));
+                        if (!data.success) {
+                            console.log('📭 Class has ended on server');
+                            // let the WS handler or local cleanup handle UI closing; still clear interval
+                            try { clearInterval(monitorClassStatus); if (window._studentMonitorInterval) { clearInterval(window._studentMonitorInterval); delete window._studentMonitorInterval; } } catch (e) {}
+                            // Ensure UI cleaned
+                            try { if (window._studentClassView) { window._studentClassView.remove(); delete window._studentClassView; } } catch (e) {}
+                            // Stop streams
+                            try { if (window._studentStream) { window._studentStream.getTracks().forEach(t=>t.stop()); delete window._studentStream; } } catch (e) {}
+                            try { if (window.studentLocalStream) { window.studentLocalStream.getTracks().forEach(t=>t.stop()); delete window.studentLocalStream; } } catch (e) {}
+                            try { localStorage.removeItem('activeStudentClass'); } catch (e) {}
+                            return;
+                        }
+                        const session = data.session;
+                        const waitingMsg = document.getElementById('waiting-message');
+                        if (session.screenSharing && !lastScreenShareState) {
+                            lastScreenShareState = true;
+                            if (waitingMsg) {
+                                waitingMsg.innerHTML = `<div style="text-align:center;color:#4CAF50;padding:40px;"><div style="font-size:80px;margin-bottom:20px;animation:pulse 1.5s infinite;">📺</div><p style="font-size:20px;margin:0 0 10px 0;font-weight:bold;">Teacher is Sharing Screen</p><p style="font-size:14px;margin:0;opacity:0.7;">Viewing teacher's screen share...</p></div><style>@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}</style>`;
+                            }
+                        } else if (!session.screenSharing && lastScreenShareState) {
+                            lastScreenShareState = false;
+                            if (waitingMsg) {
+                                waitingMsg.innerHTML = `<div style="text-align:center;color:#999;padding:40px;"><div style="font-size:80px;margin-bottom:20px;">🎬</div><p style="font-size:20px;margin:0 0 10px 0;">Waiting for teacher...</p><p style="font-size:14px;margin:0;opacity:0.7;">Teacher will share their video or screen here</p></div>`;
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+                }, 500);
+
+                // store monitor interval globally so WS handlers can clear it
+                try { window._studentMonitorInterval = monitorClassStatus; } catch (e) {}
+
+                // Leave class handling
+                document.getElementById('student-leave-btn').addEventListener('click', () => {
+                    try { if (window._studentMonitorInterval) { clearInterval(window._studentMonitorInterval); delete window._studentMonitorInterval; } } catch (e) {}
+                    try { if (window._studentStream) { window._studentStream.getTracks().forEach(t=>t.stop()); delete window._studentStream; } } catch (e) {}
+                    try { if (window.studentLocalStream) { window.studentLocalStream.getTracks().forEach(t=>t.stop()); delete window.studentLocalStream; } } catch (e) {}
+                    try { localStorage.removeItem('activeStudentClass'); } catch (e) {}
+                    try { classView.remove(); delete window._studentClassView; } catch (e) {}
+                    console.log('👋 Left the class');
+                });
+
+                document.getElementById('close-class-btn').addEventListener('click', () => {
+                    try { if (window._studentMonitorInterval) { clearInterval(window._studentMonitorInterval); delete window._studentMonitorInterval; } } catch (e) {}
+                    try { if (window._studentStream) { window._studentStream.getTracks().forEach(t=>t.stop()); delete window._studentStream; } } catch (e) {}
+                    try { if (window.studentLocalStream) { window.studentLocalStream.getTracks().forEach(t=>t.stop()); delete window.studentLocalStream; } } catch (e) {}
+                    try { localStorage.removeItem('activeStudentClass'); } catch (e) {}
+                    try { classView.remove(); delete window._studentClassView; } catch (e) {}
+                    console.log('👋 Left the class');
+                });
+
+            } catch (error) {
+                console.error('Error joining class:', error);
+                alert('Unable to join class. Please try again.');
+            }
+        }
+
+        function setupLabButtons() {
+            const joinLabBtn = document.getElementById('join-lab');
+            const practiceBtn = document.getElementById('start-practice');
+            const progressBtn = document.getElementById('view-progress');
+
+            if (joinLabBtn) {
+                joinLabBtn.addEventListener('click', () => {
+                    alert('Joining live lab session...');
+                });
+            }
+
+            if (practiceBtn) {
+                practiceBtn.addEventListener('click', () => {
+                    alert('Starting practice problems...');
+                });
+            }
+
+            if (progressBtn) {
+                progressBtn.addEventListener('click', () => {
+                    alert('Opening progress dashboard...');
+                });
+            }
+        }
+
+        function setupLibraryLinks() {
+            const allLinks = document.querySelectorAll('#course-materials a, #reference-books a, #external-resources a');
+            allLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert(`Opening: ${link.textContent}`);
+                });
+            });
+        }
+
+        let ws = null;
+        let wsReconnectAttempts = 0;
+        const maxReconnectAttempts = 3;
+
+        function connectWebSocket() {
+            try {
+                const userId = userData.userId || userData.id;
+                if (!userId) return;
+
+                // Don't reconnect if we've exceeded max attempts
+                if (wsReconnectAttempts >= maxReconnectAttempts) {
+                    console.log('⚠️ Max WebSocket reconnection attempts reached');
+                    return;
+                }
+
+                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${wsProtocol}//127.0.0.1:5002`;
+
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    console.log('✅ Connected to WebSocket');
+                    wsReconnectAttempts = 0; // Reset on successful connection
+                    ws.send(JSON.stringify({
+                        type: 'subscribe',
+                        userId: userId
+                    }));
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'payment_approved') {
+                            showNotification('Payment Approved!', 'Your payment has been verified!', 'success');
+                        }
+
+                        // Handle class started notification from teacher
+                        if (data.type === 'class_started') {
+                            const { courseCode, meetingId, classDetails } = data;
+                            console.log(`📹 Teacher started class for ${courseCode}. Students can now join!`, meetingId);
+                            updateStudentUiOnClassStarted(courseCode);
+
+                            try {
+                                const active = JSON.parse(localStorage.getItem('activeStudentClass') || 'null');
+                                if (!active || active.meetingId !== meetingId) {
+                                    // Auto-join the class for students when teacher starts
+                                    setTimeout(() => {
+                                        joinVideoClass(meetingId, courseCode, (classDetails && classDetails.courseName) || courseCode);
+                                    }, 800);
+                                }
+                            } catch (e) { console.warn('Auto-join failed:', e.message); }
+                        }
+
+                        // Handle class ended notification
+                        if (data.type === 'class_ended') {
+                            const { courseCode } = data;
+                            console.log(`✅ Class ended for ${courseCode}`);
+                            updateStudentUiOnClassEnded(courseCode);
+                        }
+
+                        // Handle class scheduled notification
+                                                // WebRTC offer from teacher
+                                                if (data.type === 'webrtc_offer' && data.sdp && data.from) {
+                                                    (async () => {
+                                                        try {
+                                                            // Create or reuse peer connection
+                                                            if (!window.studentPc) {
+                                                                window.studentPc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+
+                                                                // Add local tracks (student camera/mic) if permission granted
+                                                                try {
+                                                                    if (!window.studentLocalStream) {
+                                                                        window.studentLocalStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }).catch(()=>null);
+                                                                    }
+                                                                    if (window.studentLocalStream) {
+                                                                        window.studentLocalStream.getTracks().forEach(t=>window.studentPc.addTrack(t, window.studentLocalStream));
+                                                                    }
+                                                                } catch (e) { console.warn('Could not get student media:', e.message); }
+
+                                                                window.studentPc.ontrack = (evt) => {
+                                                                    try {
+                                                                        // Teacher's remote tracks (video/audio) - show in class view
+                                                                        const stream = evt.streams && evt.streams[0] ? evt.streams[0] : new MediaStream(evt.track ? [evt.track] : []);
+                                                                        let teacherVideo = document.getElementById('teacher-remote-video');
+                                                                        if (!teacherVideo) {
+                                                                            teacherVideo = document.createElement('video');
+                                                                            teacherVideo.id = 'teacher-remote-video';
+                                                                            teacherVideo.autoplay = true;
+                                                                            teacherVideo.playsInline = true;
+                                                                            teacherVideo.style.maxWidth = '100%';
+                                                                            teacherVideo.style.maxHeight = '100%';
+                                                                            const content = document.getElementById('class-content');
+                                                                            if (content) content.appendChild(teacherVideo);
+                                                                        }
+                                                                        teacherVideo.srcObject = stream;
+                                                                    } catch (e) { console.warn('student ontrack failed', e.message); }
+                                                                };
+
+                                                                window.studentPc.onicecandidate = (ev) => {
+                                                                    if (ev.candidate) {
+                                                                        ws.send(JSON.stringify({ type: 'webrtc_ice', to: data.from, from: (userData.userId||userData.id||'anonymous'), candidate: ev.candidate }));
+                                                                    }
+                                                                };
+                                                            }
+
+                                                            await window.studentPc.setRemoteDescription({ type: 'offer', sdp: data.sdp });
+                                                            const answer = await window.studentPc.createAnswer();
+                                                            await window.studentPc.setLocalDescription(answer);
+                                                            ws.send(JSON.stringify({ type: 'webrtc_answer', to: data.from, from: (userData.userId||userData.id||'anonymous'), sdp: answer.sdp }));
+                                                        } catch (e) { console.error('Failed to handle webrtc_offer', e); }
+                                                    })();
+                                                }
+
+                                                // WebRTC ICE candidate from teacher
+                                                if (data.type === 'webrtc_ice' && data.candidate) {
+                                                    try {
+                                                        if (window.studentPc) window.studentPc.addIceCandidate(data.candidate).catch(e=>console.warn('addIceCandidate failed', e.message));
+                                                        if (data.from && window.studentPeers && window.studentPeers[data.from]) {
+                                                            window.studentPeers[data.from].addIceCandidate(data.candidate).catch(e=>console.warn('addIceCandidate peer failed', e.message));
+                                                        }
+                                                    } catch (e) {}
+                                                }
+
+                                                // Participant joined: existing participants will create offer to the new joiner
+                                                if (data.type === 'participant_joined' && data.userId) {
+                                                    const newId = data.userId;
+                                                    const meId = userData.userId || userData.id;
+                                                    if (!meId) return;
+                                                    if (newId === meId) return;
+                                                    // Create an offer to the new participant so they receive our A/V
+                                                    createOfferTo(newId).catch(e=>console.warn('createOfferTo failed', e));
+                                                }
+
+                                                // Participant left: close peer connection and remove video
+                                                if (data.type === 'participant_left' && data.userId) {
+                                                    try {
+                                                        const pid = data.userId;
+                                                        if (window.studentPeers && window.studentPeers[pid]) {
+                                                            try { window.studentPeers[pid].close(); } catch (e) {}
+                                                            delete window.studentPeers[pid];
+                                                        }
+                                                        const v = document.getElementById('remote-' + pid);
+                                                        if (v) v.remove();
+                                                    } catch (e) {}
+                                                }
+                        if (data.type === 'class_scheduled') {
+                            const { classDetails } = data;
+                            try {
+                                const msg = `${classDetails.courseName} scheduled ${classDetails.startDate} ${classDetails.startTime}`;
+                                console.log('📣 class_scheduled received:', msg);
+                                showNotification('Class Scheduled', msg, 'info');
+                            } catch (e) { console.warn('Invalid class_scheduled payload'); }
+                        }
+
+                        // Handle screen frame frames from teacher (render into class view)
+                        if (data.type === 'screen_frame') {
+                            try {
+                                const { meetingId, frame } = data;
+                                const active = JSON.parse(localStorage.getItem('activeStudentClass') || 'null');
+                                if (active && active.meetingId === meetingId) {
+                                    const img = document.getElementById('teacher-screen-img');
+                                    const waiting = document.getElementById('waiting-message');
+                                    if (waiting) waiting.style.display = 'none';
+                                    if (img) {
+                                        img.style.display = 'block';
+                                        img.src = frame;
+                                    }
+                                }
+                            } catch (e) { /* ignore malformed frames */ }
+                        }
+
+                        // Handle explicit screen share start/stop notifications
+                        if (data.type === 'screen_share_update') {
+                            try {
+                                const { meetingId, isSharing } = data;
+                                const active = JSON.parse(localStorage.getItem('activeStudentClass') || 'null');
+                                if (active && active.meetingId === meetingId) {
+                                    const waiting = document.getElementById('waiting-message');
+                                    const img = document.getElementById('teacher-screen-img');
+                                    if (isSharing) {
+                                        if (waiting) waiting.style.display = 'none';
+                                        if (img) img.style.display = 'block';
+                                    } else {
+                                        if (waiting) waiting.style.display = 'block';
+                                        if (img) { img.style.display = 'none'; img.src = ''; }
+                                    }
+                                }
+                            } catch (e) { /* ignore */ }
+                        }
+
+                        // Handle forced account deletion / logout pushed from server
+                        if (data.type === 'account_deleted') {
+                            try {
+                                alert(data.message || 'Your account was deleted. You will be logged out.');
+                            } catch (e) {}
+                            // Clear client state and redirect to login
+                            localStorage.removeItem('userData');
+                            localStorage.removeItem('userToken');
+                            localStorage.removeItem('studentData');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 300);
+                        }
+                    } catch (error) {
+                        console.error('Error processing WebSocket message:', error);
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                };
+
+                ws.onclose = () => {
+                    wsReconnectAttempts++;
+                    if (wsReconnectAttempts < maxReconnectAttempts) {
+                        console.log(`📡 WebSocket closed. Reconnecting in 5 seconds... (attempt ${wsReconnectAttempts})`);
+                        setTimeout(connectWebSocket, 5000);
+                    }
+                };
+            } catch (error) {
+                console.error('Error connecting to WebSocket:', error);
+            }
+        }
+
+        function showNotification(title, message, type) {
+            alert(`${title}\n${message}`);
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('userData');
+                localStorage.removeItem('userToken');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Initialize page with active class restoration
+        function initPageWithRestoration() {
+            // Check if student is still in an active class
+            const activeStudentClass = JSON.parse(localStorage.getItem('activeStudentClass') || 'null');
+            
+            if (activeStudentClass && activeStudentClass.meetingId) {
+                console.log('🔔 Restoring student class session:', activeStudentClass.meetingId);
+                joinVideoClass(activeStudentClass.meetingId, activeStudentClass.courseCode, activeStudentClass.courseName);
+            } else {
+                // Normal initialization
+                initPage();
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initPageWithRestoration);
+        
+        // ----- WebRTC helper: create offer to another participant (mesh)
+        window.studentPeers = window.studentPeers || {};
+        async function createOfferTo(targetId) {
+            try {
+                if (!ws || ws.readyState !== WebSocket.OPEN) return;
+                const meId = userData.userId || userData.id || 'anonymous';
+                if (!meId || !targetId) return;
+                if (!window.studentPeers) window.studentPeers = {};
+                if (window.studentPeers[targetId]) return; // already connected
+
+                const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+                window.studentPeers[targetId] = pc;
+
+                // ensure we have local stream
+                if (!window.studentLocalStream) {
+                    try { window.studentLocalStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); } catch (e) { window.studentLocalStream = null; }
+                }
+                if (window.studentLocalStream) {
+                    window.studentLocalStream.getTracks().forEach(t=>pc.addTrack(t, window.studentLocalStream));
+                }
+
+                pc.ontrack = (evt) => {
+                    try {
+                        const stream = evt.streams && evt.streams[0] ? evt.streams[0] : new MediaStream(evt.track ? [evt.track] : []);
+                        let remoteV = document.getElementById('remote-' + targetId);
+                        if (!remoteV) {
+                            remoteV = document.createElement('video');
+                            remoteV.id = 'remote-' + targetId;
+                            remoteV.autoplay = true;
+                            remoteV.playsInline = true;
+                            remoteV.style.maxWidth = '320px';
+                            remoteV.style.margin = '6px';
+                            const content = document.getElementById('class-content');
+                            if (content) content.appendChild(remoteV);
+                        }
+                        remoteV.srcObject = stream;
+                    } catch (e) { console.warn('peer ontrack failed', e.message); }
+                };
+
+                pc.onicecandidate = (ev) => {
+                    if (ev.candidate) {
+                        try { ws.send(JSON.stringify({ type: 'webrtc_ice', to: targetId, from: meId, candidate: ev.candidate })); } catch (e) {}
+                    }
+                };
+
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                ws.send(JSON.stringify({ type: 'webrtc_offer', to: targetId, from: meId, sdp: offer.sdp }));
+            } catch (e) {
+                console.error('createOfferTo failed', e);
+            }
+        }
+                
+                // Expose a helper to mute/unmute student mic in UI
+                window.toggleStudentMic = function() {
+                    try {
+                        if (window.studentLocalStream) {
+                            const audioTrack = window.studentLocalStream.getAudioTracks()[0];
+                            if (audioTrack) {
+                                audioTrack.enabled = !audioTrack.enabled;
+                                alert('Microphone ' + (audioTrack.enabled ? 'unmuted' : 'muted'));
+                            }
+                        }
+                    } catch (e) { console.warn(e); }
+                };
+    </script>
+</body>
+</html>

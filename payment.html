@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Payment - APKL</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23667eea'>B</text></svg>">
+  <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23667eea'>B</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="payment-container">
+    <h2>Complete Your Payment</h2>
+    <p id="track-name">Track: —</p>
+
+    <div class="duration-grid">
+      <div id="btn-1year" class="duration-card active" data-duration="1-year">
+        <div>1 Year</div>
+        <div id="price-1year">$0</div>
+        <small>(Full year)</small>
+      </div>
+    </div>
+
+    <div class="amount-box">
+      <div class="amount-meta">AMOUNT TO PAY</div>
+      <div id="amount" class="amount-value">$0</div>
+      <div id="payment-note" class="payment-note">Select a payment method to continue</div>
+    </div>
+
+    <h3>Payment Methods</h3>
+    <div class="methods-grid">
+      <div class="method-card" data-method="credit-card">💳<div>Credit Card</div></div>
+      <div class="method-card" data-method="bank-transfer">🏦<div>Bank Transfer</div></div>
+      <div class="method-card" data-method="paypal">🅿️<div>PayPal</div></div>
+      <div class="method-card" data-method="gift-card">🎁<div>Gift Card</div></div>
+    </div>
+
+    <!-- Credit Card Form -->
+    <div id="card-form" class="payment-details">
+      <h4>💳 Credit Card Details</h4>
+      <label for="card-name">Cardholder Name</label>
+      <input type="text" id="card-name" placeholder="John Doe" required>
+      
+      <label for="card-number">Card Number</label>
+      <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+      
+      <label for="card-expiry">Expiry Date</label>
+      <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required>
+      
+      <label for="card-cvc">CVC</label>
+      <input type="text" id="card-cvc" placeholder="123" maxlength="4" required>
+    </div>
+
+    <!-- Bank Transfer Form -->
+    <div id="bank-form" class="payment-details">
+      <h4>🏦 Bank Transfer Details</h4>
+      <label for="select-bank">Select Bank</label>
+      <select id="select-bank" required>
+        <option value="">-- Choose a Bank --</option>
+        <option value="Access Bank">Access Bank</option>
+        <option value="Fidelity Bank">Fidelity Bank</option>
+        <option value="First Bank">First Bank</option>
+        <option value="Guaranty Trust Bank">Guaranty Trust Bank (GTB)</option>
+        <option value="NOVA Bank">NOVA Bank</option>
+        <option value="Opay">Opay</option>
+        <option value="Polaris Bank">Polaris Bank</option>
+        <option value="Stanbic IBTC">Stanbic IBTC</option>
+        <option value="Standard Chartered">Standard Chartered</option>
+        <option value="Sterling Bank">Sterling Bank</option>
+        <option value="Zenith Bank">Zenith Bank</option>
+        <option value="UBA">UBA (United Bank for Africa)</option>
+        <option value="Union Bank">Union Bank</option>
+        <option value="Wema Bank">Wema Bank</option>
+      </select>
+      
+      <label for="bank-account">Account Number</label>
+      <input type="text" id="bank-account" placeholder="0123456789" required>
+      
+      <label for="bank-pin">PIN/Password</label>
+      <input type="password" id="bank-pin" placeholder="Enter your PIN" required>
+    </div>
+
+    <!-- PayPal Form -->
+    <div id="paypal-form" class="payment-details">
+      <h4>🅿️ PayPal Account</h4>
+      <label for="paypal-email">PayPal Email</label>
+      <input type="email" id="paypal-email" placeholder="your@email.com" required>
+      <p class="paypal-note">You will be redirected to PayPal to complete payment securely.</p>
+    </div>
+
+    <!-- Gift Card Form -->
+    <div id="giftcard-form" class="payment-details">
+      <h4>🎁 Gift Card Details</h4>
+      <label for="giftcard-number">Gift Card Number</label>
+      <input type="text" id="giftcard-number" placeholder="1234-5678-9012-3456" required>
+      
+      <label for="giftcard-pin">PIN (if applicable)</label>
+      <input type="password" id="giftcard-pin" placeholder="Enter PIN (optional)">
+    </div>
+
+    <div class="actions-right">
+      <button id="pay-now" class="btn-pay">Authorize & Process Payment</button>
+    </div>
+
+  </div>
+
+  <script src="payment.js"></script>
+</body>
+</html>

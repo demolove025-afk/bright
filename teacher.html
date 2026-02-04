@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Teacher Portal - APKL Learning Management System">
+    <title>Teacher Portal - APKL</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23667eea'>B</text></svg>">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23667eea'>B</text></svg>">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="admin-dashboard/style.css">
+    <link rel="stylesheet" href="teacher.css">
+    
+    <!-- Inline Styles -->
+    <style>
+        /* =====================================================
+           INLINE STYLES - Authentication & Message Display
+           ===================================================== */
+        
+        /* Video Modal Display */
+        #video-call-modal:not(.hidden) {
+            display: flex !important;
+            visibility: visible !important;
+        }
+
+        /* Password Field Wrapper */
+        .password-wrapper {
+            position: relative;
+        }
+
+        /* Toggle Password Button */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Authentication Button */
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Authentication Toggle Links */
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .auth-toggle a {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error Message */
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        /* Success Message */
+        .success-msg {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        /* Hidden Class */
+        .hidden {
+            display: none !important;
+        }
+        /* Improved Video Call Styles */
+        #video-call-modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .video-call-container {
+            width: min(1100px, 98%);
+            max-height: 90vh;
+            background: linear-gradient(180deg, #071022 0%, #0b1222 100%);
+            color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(2,6,23,0.6);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-call-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .video-grid-container {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 12px;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .videos-grid { grid-template-columns: 1fr; }
+            .screen-share-container { display: none; }
+        }
+
+        .video-tile {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 320px;
+            box-shadow: 0 6px 20px rgba(2,6,23,0.5);
+        }
+
+        .video-tile video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            background: #000;
+        }
+
+        .video-label {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            background: rgba(0,0,0,0.45);
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            color: #fff;
+            -webkit-backdrop-filter: blur(4px); /* Safari/iOS */
+            backdrop-filter: blur(4px);
+        }
+
+        .video-controls-overlay {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.45);
+            color: #fff;
+        }
+
+        .video-controls-bar {
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06));
+            border-top: 1px solid rgba(255,255,255,0.03);
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            min-width: 88px;
+            justify-content: center;
+        }
+
+        .control-btn.end-btn {
+            background: linear-gradient(90deg,#ef4444,#dc2626);
+            box-shadow: 0 6px 18px rgba(220,38,38,0.18);
+        }
+
+        .control-btn.disabled { opacity: 0.5; }
+
+        .screen-share-container {
+            width: 320px;
+            max-width: 34%;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #071022;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+
+        .screen-share-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .stop-screen-btn {
+            padding: 8px 10px;
+            border: none;
+            background: #ef4444;
+            color: white;
+            margin: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- =====================================================
+         AUTHENTICATION SECTION - Login & Registration
+         ===================================================== -->
+    <div class="auth-container" id="auth-section">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>APKL Teacher</h1>
+                <p>Teaching Management Portal</p>
+            </div>
+
+            <div class="error-msg" id="error-msg"></div>
+            <div class="success-msg" id="success-msg"></div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="active">
+                <h2 class="form-header">Sign In</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="teacher@apkl.edu" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('login-password')">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-auth">Sign In</button>
+                <p class="auth-toggle">Don't have an account? <a onclick="switchForms(event)">Register</a></p>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="register-form" class="hidden">
+                <h2 class="form-header">Create Account</h2>
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" placeholder="Dr. Jane Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="teacher@apkl.edu" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="register-password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('register-password')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" placeholder="+234 (0) 800 1234 567" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-department">Track</label>
+                    <select id="register-department" required>
+                        <option value="">Select Track</option>
+                        <option value="uiux">UI/UX Design</option>
+                        <option value="webdev">Web Development</option>
+                        <option value="mobiledev">Mobile Development</option>
+                        <option value="fullstack">Fullstack Development</option>
+                        <option value="datascience">Data Science</option>
+                        <option value="cybersecurity">Cybersecurity</option>
+                        <option value="cloud">Cloud Computing</option>
+                        <option value="ai">Artificial Intelligence</option>
+                        <option value="animation">Animation</option>
+                        <option value="marketing">Digital Marketing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="register-specialization">Specialization</label>
+                    <input type="text" id="register-specialization" placeholder="e.g., Data Science, Web Development" required>
+                </div>
+                <button type="submit" class="btn-auth">Create Account</button>
+                <p class="auth-toggle">Already have an account? <a onclick="switchForms(event)">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+    <!-- Recipient selection modal (choose which users to notify) -->
+    <div id="select-recipients-modal" class="modal hidden">
+        <div class="modal-content recipients-modal-content">
+            <h3>Select Recipients</h3>
+            <p class="recipients-instructions">No enrolled students were found automatically — choose which users should receive the notification.</p>
+            <div id="recipients-list" class="recipients-list"></div>
+            <div class="recipients-actions">
+                <button type="button" id="recipients-cancel" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="recipients-confirm" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard (hidden initially) -->
+    <div id="dashboard-section" class="admin-container hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>APKL Teacher</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <span class="icon">🏠</span> Dashboard
+                    </a></li>
+                    <li><a href="#my-courses" class="nav-link" data-section="my-courses">
+                        <span class="icon">📚</span> My Courses
+                    </a></li>
+                    <li><a href="#assignments" class="nav-link" data-section="assignments">
+                        <span class="icon">📝</span> Assignments
+                    </a></li>
+                    <li><a href="#grades" class="nav-link" data-section="grades">
+                        <span class="icon">📊</span> Grades
+                    </a></li>
+                    <li><a href="#students" class="nav-link" data-section="students">
+                        <span class="icon">👥</span> Students
+                    </a></li>
+                    <li><a href="#announcements" class="nav-link" data-section="announcements">
+                        <span class="icon">📢</span> Announcements
+                    </a></li>
+                    <li><a href="#" class="nav-link logout" id="logout-btn">
+                        <span class="icon">🚪</span> Logout
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="top-bar-right">
+                    <input type="search" class="search-box" placeholder="Search...">
+                    <div class="user-profile">
+                        <span id="user-name">Dr. Teacher</span>
+                        <div class="user-avatar">👤</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content-wrapper">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section-content" class="content-section active">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <h3>My Courses</h3>
+                                <p class="stat-value" id="courses-count">3</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <h3>Total Students</h3>
+                                <p class="stat-value" id="students-count">45</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-info">
+                                <h3>Pending Assignments</h3>
+                                <p class="stat-value" id="assignments-count">8</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <h3>Submissions</h3>
+                                <p class="stat-value" id="submissions-count">32</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="section-panel">
+                        <h3>Recent Activities</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Activity</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Data Structures</td>
+                                    <td>Assignment 2 posted</td>
+                                    <td>2026-01-28</td>
+                                    <td><span class="status-success">✅ Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Algorithms</td>
+                                    <td>Graded 12 submissions</td>
+                                    <td>2026-01-27</td>
+                                    <td><span class="status-success">✅ Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Web Development</td>
+                                    <td>New student enrolled</td>
+                                    <td>2026-01-26</td>
+                                    <td><span class="status-success">✅ Noted</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- My Courses Section -->
+                <section id="my-courses-section" class="content-section">
+                    <div class="section-panel">
+                        <div class="section-header">
+                            <h3>My Courses</h3>
+                            <div class="add-course-container">
+                                <button id="add-course-btn" class="btn">+ Add Course</button>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Instructor</th>
+                                    <th>Schedule</th>
+                                    <th>Students</th>
+                                    <th>Track</th>
+                                    <th>Created</th>
+                                    <th>Updated</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courses-list">
+                                <tr>
+                                    <td>CS101</td>
+                                    <td>Introduction to Programming</td>
+                                    <td>25</td>
+                                    <td>MWF 10:00-11:00</td>
+                                    <td><button class="btn-small btn-start">Start</button></td>
+                                </tr>
+                                <tr>
+                                    <td>CS102</td>
+                                    <td>Data Structures</td>
+                                    <td>20</td>
+                                    <td>TTh 14:00-15:30</td>
+                                    <td><button class="btn-small btn-start">Start</button></td>
+                                </tr>
+                                <tr>
+                                    <td>CS201</td>
+                                    <td>Database Systems</td>
+                                    <td>18</td>
+                                    <td>MWF 13:00-14:00</td>
+                                    <td><button class="btn-small btn-start">Start</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Schedule Class Section -->
+                <section id="schedule-class-section" class="content-section">
+                    <div class="section-panel">
+                        <div class="section-header">
+                            <h3>Schedule a Class</h3>
+                            <div class="add-course-container"></div>
+                        </div>
+
+                        <form id="schedule-class-form" class="schedule-form">
+                            <div class="form-row">
+                                <div class="form-group flex-1 mr-10">
+                                    <label for="class-course">Course</label>
+                                    <select id="class-course">
+                                        <option value="">Select course (Code|Name)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group w-150">
+                                    <label for="class-date">Date</label>
+                                    <input type="date" id="class-date" />
+                                </div>
+                                <div class="form-group w-140 ml-10">
+                                    <label for="class-time">Time</label>
+                                    <input type="time" id="class-time" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="class-topic">Topic</label>
+                                <input id="class-topic" placeholder="Class topic / title" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="class-description">Description</label>
+                                <textarea id="class-description" class="course-description" placeholder="Optional description"></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group w-120">
+                                    <label for="class-duration">Duration (min)</label>
+                                    <input type="number" id="class-duration" value="60" min="1" />
+                                </div>
+                                <div class="form-actions ml-auto">
+                                    <button type="button" class="btn" id="reset-schedule">Reset</button>
+                                    <button type="button" class="btn btn-primary" id="send-class-notification">Send</button>
+                                </div>
+                            </div>
+                        </form>
+                        <h4 class="mt-18">Scheduled Classes</h4>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Topic</th>
+                                    <th>Date / Time</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduled-classes-list">
+                                <tr><td class="empty-row" colspan="6">No scheduled classes yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Assignments Section -->
+                <section id="assignments-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Manage Assignments</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Assignment</th>
+                                    <th>Due Date</th>
+                                    <th>Submissions</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CS101</td>
+                                    <td>Assignment 2</td>
+                                    <td>2026-02-05</td>
+                                    <td>12/25</td>
+                                    <td><button class="btn-small btn-view">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>CS102</td>
+                                    <td>Lab Report 3</td>
+                                    <td>2026-02-02</td>
+                                    <td>18/20</td>
+                                    <td><button class="btn-small btn-view">Grade</button></td>
+                                </tr>
+                                <tr>
+                                    <td>CS201</td>
+                                    <td>Project Proposal</td>
+                                    <td>2026-01-31</td>
+                                    <td>15/18</td>
+                                    <td><button class="btn-small btn-view">Review</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Grades Section -->
+                <section id="grades-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Grade Management</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Student</th>
+                                    <th>Assessment</th>
+                                    <th>Score</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CS101</td>
+                                    <td>John Smith</td>
+                                    <td>Quiz 1</td>
+                                    <td>85/100</td>
+                                    <td><span class="grade-excellent">A</span></td>
+                                </tr>
+                                <tr>
+                                    <td>CS102</td>
+                                    <td>Jane Doe</td>
+                                    <td>Midterm</td>
+                                    <td>92/100</td>
+                                    <td><span class="grade-excellent">A+</span></td>
+                                </tr>
+                                <tr>
+                                    <td>CS201</td>
+                                    <td>Bob Wilson</td>
+                                    <td>Project</td>
+                                    <td>78/100</td>
+                                    <td><span class="grade-good">B+</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Students Section -->
+                <section id="students-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Enrolled Students</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Course</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>STU001</td>
+                                    <td>John Smith</td>
+                                    <td>john@apkl.edu</td>
+                                    <td>CS101, CS102</td>
+                                    <td><span class="status-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>STU002</td>
+                                    <td>Jane Doe</td>
+                                    <td>jane@apkl.edu</td>
+                                    <td>CS102, CS201</td>
+                                    <td><span class="status-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>STU003</td>
+                                    <td>Bob Wilson</td>
+                                    <td>bob@apkl.edu</td>
+                                    <td>CS201</td>
+                                    <td><span class="status-success">Active</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Announcements Section -->
+                <section id="announcements-section" class="content-section">
+                    <div class="section-panel">
+                        <h3>Post Announcements</h3>
+                        <div class="announcement-form">
+                            <textarea id="announcement-text" class="announcement-textarea" placeholder="Write your announcement here..."></textarea>
+                            <button class="btn btn-primary announcement-btn" onclick="postAnnouncement()">Post Announcement</button>
+                        </div>
+                        <h4>Recent Announcements</h4>
+                        <div class="announcement-card">
+                            <p><strong>Class Cancelled</strong> - CS101 class on Jan 30 is postponed to Feb 2</p>
+                            <small class="announcement-timestamp">Posted: 2026-01-28</small>
+                        </div>
+                        <div class="announcement-card">
+                            <p><strong>Assignment Deadline Extended</strong> - CS102 assignment deadline extended to Feb 5</p>
+                            <small class="announcement-timestamp">Posted: 2026-01-27</small>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Course Modal (Add / Manage) -->
+    <div id="course-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="course-modal-title">Add Course</h3>
+            <form id="course-form">
+                <div class="form-group">
+                    <label for="course-id">ID (Auto-generated)</label>
+                    <input id="course-id" readonly class="readonly-input" />
+                </div>
+                <div class="form-group">
+                    <label for="course-code">Course Code *</label>
+                    <input id="course-code" required placeholder="e.g., FS101" />
+                </div>
+                <div class="form-group">
+                    <label for="course-name">Course Name *</label>
+                    <input id="course-name" required placeholder="e.g., Frontend Fundamentals" />
+                </div>
+                <div class="form-group">
+                    <label for="course-description">Description</label>
+                    <textarea id="course-description" placeholder="Course description" class="course-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="course-instructor">Instructor *</label>
+                    <input id="course-instructor" required placeholder="Instructor name" />
+                </div>
+                <div class="form-group">
+                    <label for="course-schedule">Schedule *</label>
+                    <input id="course-schedule" required placeholder="e.g., MWF 10:00-11:00" />
+                </div>
+                <div class="form-group">
+                    <label for="course-students">Number of Students *</label>
+                    <input id="course-students" type="number" required min="0" value="0" />
+                </div>
+                <div class="form-group">
+                    <label for="course-track">Track (Read-only)</label>
+                    <input id="course-track" readonly class="readonly-input" />
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-course">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-course">Save Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Course Schedule Modal -->
+    <div id="manage-schedule-modal" class="modal hidden">
+        <div class="modal-content manage-schedule-modal">
+            <div class="modal-header">
+                <h3 id="manage-schedule-title">Manage Course Schedule</h3>
+                <button type="button" class="close-modal-btn" onclick="document.getElementById('manage-schedule-modal').classList.add('hidden')">✕</button>
+            </div>
+            <form id="manage-schedule-form">
+                <div class="form-group">
+                    <label for="manage-course-name">Course Name</label>
+                    <input type="text" id="manage-course-name" readonly class="readonly-input" />
+                </div>
+                <div class="form-group">
+                    <label for="manage-course-code">Course Code</label>
+                    <input type="text" id="manage-course-code" readonly class="readonly-input" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="manage-start-date">Start Date *</label>
+                        <input type="date" id="manage-start-date" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="manage-start-time">Start Time *</label>
+                        <input type="time" id="manage-start-time" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="manage-end-date">End Date *</label>
+                        <input type="date" id="manage-end-date" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="manage-end-time">End Time *</label>
+                        <input type="time" id="manage-end-time" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="manage-frequency">Frequency *</label>
+                    <select id="manage-frequency" required>
+                        <option value="">Select frequency...</option>
+                        <option value="daily">Daily</option>
+                        <option value="mwf">Monday, Wednesday, Friday</option>
+                        <option value="tth">Tuesday, Thursday</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="once">One-time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="manage-location">Location/Room *</label>
+                    <input type="text" id="manage-location" placeholder="e.g., Room 101, Online, Zoom" required />
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('manage-schedule-modal').classList.add('hidden')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Zoom-like Video Call Interface -->
+    <div id="video-call-modal" class="modal hidden">
+        <div class="video-call-container">
+            <!-- Header -->
+            <div class="video-call-header">
+                <div class="meeting-info">
+                    <h2 id="meeting-title">Video Class Session</h2>
+                    <p id="meeting-code">Meeting ID: Loading...</p>
+                </div>
+                <button type="button" id="close-video-call" class="close-btn">✕</button>
+            </div>
+
+            <!-- Video Grid -->
+            <div class="video-grid-container">
+                <div id="videos-grid" class="videos-grid">
+                    <!-- Teacher video -->
+                    <div class="video-tile teacher-video">
+                        <video id="teacher-video" autoplay muted></video>
+                        <div class="video-label">You (Teacher)</div>
+                        <div class="video-controls-overlay">
+                            <span id="teacher-mute-status" class="status-badge">🔴 Recording</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen Share Display -->
+                <div id="screen-share-container" class="screen-share-container hidden">
+                    <video id="screen-video" autoplay></video>
+                    <button type="button" id="stop-screen-share" class="stop-screen-btn">Stop Sharing</button>
+                </div>
+            </div>
+
+            <!-- Control Bar -->
+            <div class="video-controls-bar">
+                <button type="button" id="toggle-camera" class="control-btn camera-btn" title="Toggle Camera">
+                    <span class="icon">📹</span>
+                    <span class="label">Camera</span>
+                </button>
+                <button type="button" id="toggle-microphone" class="control-btn mic-btn" title="Toggle Microphone">
+                    <span class="icon">🎤</span>
+                    <span class="label">Microphone</span>
+                </button>
+                <button type="button" id="share-screen" class="control-btn screen-btn" title="Share Screen">
+                    <span class="icon">🖥️</span>
+                    <span class="label">Share Screen</span>
+                </button>
+                <button type="button" id="chat-btn" class="control-btn chat-btn" title="Chat">
+                    <span class="icon">💬</span>
+                    <span class="label">Chat</span>
+                </button>
+                <button type="button" id="participants-btn" class="control-btn participants-btn" title="Participants">
+                    <span class="icon">👥</span>
+                    <span class="label">Participants</span>
+                </button>
+                <button type="button" id="end-call" class="control-btn end-btn" title="End Call">
+                    <span class="icon">📞</span>
+                    <span class="label">End Call</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Suppress Chrome extension runtime errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('Could not establish connection') || message.includes('Receiving end does not exist') || message.includes('runtime.lastError')) {
+                return; // Suppress this error
+            }
+            originalError.apply(console, args);
+        };
+
+        window.addEventListener('error', (event) => {
+            if (event.message && (event.message.includes('Could not establish connection') || event.message.includes('Receiving end does not exist'))) {
+                event.preventDefault();
+                return true;
+            }
+        }, true);
+
+        // Suppress unchecked runtime.lastError
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Handle all messages from content scripts
+            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+                try {
+                    sendResponse({});
+                } catch (e) {
+                    // Silently fail
+                }
+                return true;
+            });
+
+            // Continuously clear lastError
+            setInterval(() => {
+                try {
+                    if (chrome.runtime.lastError) {
+                        void chrome.runtime.lastError;
+                    }
+                } catch (e) {
+                    // Ignore
+                }
+            }, 100);
+        }
+
+        const API_URL = window.appConfig?.API_URL || 'http://127.0.0.1:5002';
+        
+        // Video Call State Management
+        const videoCallState = {
+            meetingId: null,
+            cameraEnabled: true,
+            microphoneEnabled: true,
+            screenSharing: false,
+            localStream: null,
+            screenStream: null,
+            peers: [],
+            isActive: false,
+            currentCourseCode: null
+        };
+
+        // Check if there's an active class session from before page reload
+        function restoreActiveClassSession() {
+            const activeClass = JSON.parse(localStorage.getItem('activeTeacherClass') || 'null');
+            if (activeClass && activeClass.meetingId) {
+                console.log('📹 Restoring active class session:', activeClass.meetingId);
+                
+                // Restore video call modal
+                const videoCallModal = document.getElementById('video-call-modal');
+                if (videoCallModal) {
+                    videoCallModal.classList.remove('hidden');
+                    videoCallState.meetingId = activeClass.meetingId;
+                    videoCallState.isActive = true;
+                    videoCallState.currentCourseCode = activeClass.courseCode;
+                    
+                    document.getElementById('meeting-title').textContent = `${activeClass.courseCode} - Live Class (Continued)`;
+                    document.getElementById('meeting-code').textContent = 'Meeting ID: ' + activeClass.meetingId;
+                    
+                    console.log('✅ Class session restored');
+                }
+            }
+        }
+
+        // Auto-restore class on page load (after a short delay to ensure DOM is ready)
+        window.addEventListener('load', () => {
+            setTimeout(restoreActiveClassSession, 500);
+        });
+        
+        // Generate unique meeting ID
+        function generateMeetingId() {
+            return 'APKL-' + Math.random().toString(36).substr(2, 9).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+        }
+        
+        // Toggle Camera
+        document.getElementById('toggle-camera').addEventListener('click', () => {
+            if (videoCallState.localStream) {
+                const videoTrack = videoCallState.localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoCallState.cameraEnabled = !videoCallState.cameraEnabled;
+                    videoTrack.enabled = videoCallState.cameraEnabled;
+                    
+                    const btn = document.getElementById('toggle-camera');
+                    btn.classList.toggle('disabled', !videoCallState.cameraEnabled);
+                    btn.style.opacity = videoCallState.cameraEnabled ? '1' : '0.5';
+                    btn.style.backgroundColor = videoCallState.cameraEnabled ? '' : '#ff6b6b';
+                }
+            }
+        });
+        
+        // Toggle Microphone
+        document.getElementById('toggle-microphone').addEventListener('click', () => {
+            if (videoCallState.localStream) {
+                const audioTrack = videoCallState.localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    videoCallState.microphoneEnabled = !videoCallState.microphoneEnabled;
+                    audioTrack.enabled = videoCallState.microphoneEnabled;
+                    
+                    const btn = document.getElementById('toggle-microphone');
+                    btn.classList.toggle('disabled', !videoCallState.microphoneEnabled);
+                    btn.style.opacity = videoCallState.microphoneEnabled ? '1' : '0.5';
+                    btn.style.backgroundColor = videoCallState.microphoneEnabled ? '' : '#ff6b6b';
+                }
+            }
+        });
+        
+        // Share Screen (server-integrated)
+        document.getElementById('share-screen').addEventListener('click', async () => {
+            try {
+                if (!videoCallState.screenSharing) {
+                    const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { cursor: 'always', displaySurface: 'monitor' },
+                        audio: false
+                    });
+
+                    videoCallState.screenStream = screenStream;
+                    videoCallState.screenSharing = true;
+
+                    const screenVideo = document.getElementById('screen-video');
+                    screenVideo.srcObject = screenStream;
+
+                    const screenContainer = document.getElementById('screen-share-container');
+                    screenContainer.classList.remove('hidden');
+
+                    // Dim other videos
+                    const videosGrid = document.getElementById('videos-grid');
+                    videosGrid.style.opacity = '0.2';
+                    videosGrid.style.pointerEvents = 'none';
+
+                    const btn = document.getElementById('share-screen');
+                    btn.style.backgroundColor = '#4CAF50';
+                    btn.innerHTML = '<span class="icon">✓</span><span class="label">Screen Sharing</span>';
+
+                    // Notify server that screen sharing started
+                    try {
+                        await fetch(`${API_URL}/api/classes/screen-share`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ meetingId: videoCallState.meetingId, isSharing: true })
+                        });
+                        console.log('📺 Screen sharing started - notified server and students');
+                    } catch (err) {
+                        console.warn('⚠️ Could not notify server of screen share:', err.message);
+                    // Stop sending screen frames over WebSocket if active
+                    try {
+                        if (videoCallState.screenFrameInterval) {
+                            clearInterval(videoCallState.screenFrameInterval);
+                            videoCallState.screenFrameInterval = null;
+                        }
+                    } catch (e) { /* ignore */ }
+                    }
+
+                    // If WebSocket is connected, start sending periodic screen frames (low-bandwidth fallback)
+                    try {
+                        if (teacherWs && teacherWs.readyState === WebSocket.OPEN) {
+                            const screenVideoEl = screenVideo;
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const sendFrame = () => {
+                                try {
+                                    if (!videoCallState.screenSharing || !screenVideoEl || screenVideoEl.readyState < 2) return;
+                                    const w = Math.min(1280, screenVideoEl.videoWidth || 640);
+                                    const h = Math.min(720, screenVideoEl.videoHeight || 360);
+                                    canvas.width = w;
+                                    canvas.height = h;
+                                    ctx.drawImage(screenVideoEl, 0, 0, w, h);
+                                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                                    // send as JSON message (may be large)
+                                    teacherWs.send(JSON.stringify({ type: 'screen_frame', meetingId: videoCallState.meetingId, frame: dataUrl }));
+                                } catch (e) { /* ignore frame errors */ }
+                            };
+                            // Store interval id so we can clear later
+                            videoCallState.screenFrameInterval = setInterval(sendFrame, 700);
+                        }
+                    } catch (e) { console.warn('Could not start screen-frame broadcast:', e.message); }
+
+                    // Handle when user stops sharing from browser
+                    screenStream.getTracks()[0].addEventListener('ended', () => {
+                        stopScreenShare();
+                    });
+                } else {
+                    stopScreenShare();
+                }
+            } catch (error) {
+                console.error('Error sharing screen:', error);
+                if (error.name !== 'NotAllowedError') {
+                    alert('Unable to share screen. Please try again.');
+                }
+            }
+        });
+
+        async function stopScreenShare() {
+            if (videoCallState.screenStream) {
+                videoCallState.screenStream.getTracks().forEach(track => track.stop());
+            }
+            videoCallState.screenSharing = false;
+            videoCallState.screenStream = null;
+
+            const screenContainer = document.getElementById('screen-share-container');
+            screenContainer.classList.add('hidden');
+
+            // Restore video grid visibility
+            const videosGrid = document.getElementById('videos-grid');
+            videosGrid.style.opacity = '1';
+            videosGrid.style.pointerEvents = 'auto';
+
+            const btn = document.getElementById('share-screen');
+            btn.style.backgroundColor = '';
+            btn.innerHTML = '<span class="icon">🖥️</span><span class="label">Share Screen</span>';
+
+            // Notify server that screen sharing stopped
+            try {
+                await fetch(`${API_URL}/api/classes/screen-share`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ meetingId: videoCallState.meetingId, isSharing: false })
+                });
+                console.log('📺 Screen sharing stopped - notified server');
+            } catch (err) {
+                console.warn('⚠️ Could not notify server of screen stop:', err.message);
+            }
+        }
+        
+        // Chat Button
+        document.getElementById('chat-btn').addEventListener('click', () => {
+            alert('Chat feature coming soon! Students can message during the class.');
+        });
+        
+        // Participants Button
+        document.getElementById('participants-btn').addEventListener('click', () => {
+            alert('Participants in this class: ' + (document.getElementById('course-students').value || 'Loading...'));
+        });
+        
+        // End Call
+        document.getElementById('end-call').addEventListener('click', () => {
+            if (confirm('End the class session?')) {
+                endVideoCall();
+            }
+        });
+        
+        // Close Video Call Modal
+        document.getElementById('close-video-call').addEventListener('click', () => {
+            if (confirm('End the class session?')) {
+                endVideoCall();
+            }
+        });
+        
+        function endVideoCall() {
+            // Stop all tracks
+            if (videoCallState.localStream) {
+                videoCallState.localStream.getTracks().forEach(track => track.stop());
+            }
+            if (videoCallState.screenStream) {
+                videoCallState.screenStream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Reset state
+            videoCallState.isActive = false;
+            videoCallState.cameraEnabled = true;
+            videoCallState.microphoneEnabled = true;
+            videoCallState.screenSharing = false;
+            
+            const courseCode = videoCallState.currentCourseCode;
+            
+            // Clear persistent active class state
+            localStorage.removeItem('activeTeacherClass');
+            
+            // Remove the scheduled class from class-schedules
+            try {
+                const scheduledClasses = JSON.parse(localStorage.getItem('scheduledClasses') || '[]');
+                const updatedClasses = scheduledClasses.filter(c => c.courseCode !== courseCode);
+                localStorage.setItem('scheduledClasses', JSON.stringify(updatedClasses));
+                console.log('✅ Removed class schedule for:', courseCode);
+            } catch (e) {
+                console.warn('Could not update scheduled classes:', e.message);
+            }
+            
+            // Close modal
+            document.getElementById('video-call-modal').classList.add('hidden');
+            document.getElementById('screen-share-container').classList.add('hidden');
+
+            // Update course button back to "Manage"
+            try {
+                const courseTables = document.querySelectorAll('[id*="courses-list"]');
+                if (courseTables.length > 0) {
+                    const courseTable = courseTables[0];
+                    const rows = courseTable.querySelectorAll('tr');
+                    // Do not revert Start button back to Manage — keep Start persistent
+                    // (UI remains Start so teacher can start classes anytime)
+                    // No-op here intentionally.
+                }
+            } catch (e) {
+                console.warn('Could not update course button:', e.message);
+            }
+
+            // Notify server class ended
+            try {
+                const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+                const teacherId = teacher.id || teacher.userId || teacher.email || null;
+                const meetingId = videoCallState.meetingId;
+                if (meetingId) {
+                    fetch(`${API_URL}/api/class/end`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ courseCode, meetingId, teacherId })
+                    }).catch(err => console.warn('Could not notify server of class end:', err.message));
+                    // Also notify server-managed active sessions to clean up
+                    try {
+                        fetch(`${API_URL}/api/classes/end`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ meetingId, courseCode })
+                        }).catch(()=>{});
+                    } catch (e) { /* ignore */ }
+
+                    // Notify connected students via WebSocket that class ended
+                    try {
+                        if (teacherWs && teacherWs.readyState === WebSocket.OPEN) {
+                            teacherWs.send(JSON.stringify({ type: 'class_ended', courseCode, meetingId }));
+                        }
+                    } catch (e) { console.warn('Could not send class_ended WS message', e); }
+
+                    // Close all teacher peer connections and remove remote elements
+                    try {
+                        teacherPeerConnections.forEach((pc, pid) => {
+                            try { pc.close(); } catch (e) {}
+                        });
+                        teacherPeerConnections.clear();
+                        teacherRemoteElements.forEach((el, pid) => {
+                            try { el.remove(); } catch (e) {}
+                        });
+                        teacherRemoteElements.clear();
+                    } catch (e) { console.warn('Error cleaning teacher peer connections', e); }
+                }
+            } catch (e) { console.warn('End notify error:', e.message); }
+
+            alert('Class session ended. Button has been changed to "Manage" to schedule another class.');
+        }
+
+        // Track-based courses mapping
+        const trackCoursesMap = {
+            'ui-ux': {
+                courses: [
+                    { code: 'UI101', name: 'UI Design Fundamentals', students: 20, schedule: 'MWF 09:00-10:00' },
+                    { code: 'UI102', name: 'Advanced Prototyping', students: 18, schedule: 'TTh 14:00-15:30' },
+                    { code: 'UI103', name: 'User Research Methods', students: 15, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'UI Design Fundamentals', activity: 'Project 1 submitted', date: '2026-01-28' },
+                    { course: 'Advanced Prototyping', activity: 'Design review completed', date: '2026-01-27' },
+                    { course: 'User Research Methods', activity: 'Survey results published', date: '2026-01-26' }
+                ]
+            },
+            'uiux': {
+                courses: [
+                    { code: 'UI101', name: 'UI Design Fundamentals', students: 20, schedule: 'MWF 09:00-10:00' },
+                    { code: 'UI102', name: 'Advanced Prototyping', students: 18, schedule: 'TTh 14:00-15:30' },
+                    { code: 'UI103', name: 'User Research Methods', students: 15, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'UI Design Fundamentals', activity: 'Project 1 submitted', date: '2026-01-28' },
+                    { course: 'Advanced Prototyping', activity: 'Design review completed', date: '2026-01-27' },
+                    { course: 'User Research Methods', activity: 'Survey results published', date: '2026-01-26' }
+                ]
+            },
+            'web-dev': {
+                courses: [
+                    { code: 'WEB101', name: 'HTML & CSS Basics', students: 30, schedule: 'MWF 09:00-10:00' },
+                    { code: 'WEB102', name: 'JavaScript Essentials', students: 28, schedule: 'TTh 14:00-15:30' },
+                    { code: 'WEB103', name: 'React.js Framework', students: 25, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'HTML & CSS Basics', activity: 'Assignment 3 posted', date: '2026-01-28' },
+                    { course: 'JavaScript Essentials', activity: 'Quiz 2 results released', date: '2026-01-27' },
+                    { course: 'React.js Framework', activity: 'Project submission deadline', date: '2026-01-26' }
+                ]
+            },
+            'webdev': {
+                courses: [
+                    { code: 'WEB101', name: 'HTML & CSS Basics', students: 30, schedule: 'MWF 09:00-10:00' },
+                    { code: 'WEB102', name: 'JavaScript Essentials', students: 28, schedule: 'TTh 14:00-15:30' },
+                    { code: 'WEB103', name: 'React.js Framework', students: 25, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'HTML & CSS Basics', activity: 'Assignment 3 posted', date: '2026-01-28' },
+                    { course: 'JavaScript Essentials', activity: 'Quiz 2 results released', date: '2026-01-27' },
+                    { course: 'React.js Framework', activity: 'Project submission deadline', date: '2026-01-26' }
+                ]
+            },
+            'mobile-dev': {
+                courses: [
+                    { code: 'MOB101', name: 'Mobile Development Basics', students: 22, schedule: 'MWF 10:00-11:00' },
+                    { code: 'MOB102', name: 'iOS Development', students: 18, schedule: 'TTh 13:00-14:30' },
+                    { code: 'MOB103', name: 'Android Development', students: 20, schedule: 'MWF 14:00-15:00' }
+                ],
+                activities: [
+                    { course: 'Mobile Development Basics', activity: 'Lab session completed', date: '2026-01-28' },
+                    { course: 'iOS Development', activity: 'App submission reviewed', date: '2026-01-27' },
+                    { course: 'Android Development', activity: 'Debugging session scheduled', date: '2026-01-26' }
+                ]
+            },
+            'fullstack': {
+                courses: [
+                    { code: 'FS101', name: 'Frontend Fundamentals', students: 35, schedule: 'MWF 09:00-10:00' },
+                    { code: 'FS102', name: 'Backend Development', students: 32, schedule: 'TTh 14:00-15:30' },
+                    { code: 'FS103', name: 'Full Stack Integration', students: 28, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'Frontend Fundamentals', activity: 'Sprint 2 planning started', date: '2026-01-28' },
+                    { course: 'Backend Development', activity: 'API documentation updated', date: '2026-01-27' },
+                    { course: 'Full Stack Integration', activity: 'Deployment review completed', date: '2026-01-26' }
+                ]
+            },
+            'data-science': {
+                courses: [
+                    { code: 'DS101', name: 'Data Analysis Basics', students: 25, schedule: 'MWF 10:00-11:00' },
+                    { code: 'DS102', name: 'Machine Learning', students: 22, schedule: 'TTh 13:00-14:30' },
+                    { code: 'DS103', name: 'Deep Learning', students: 18, schedule: 'MWF 14:00-15:00' }
+                ],
+                activities: [
+                    { course: 'Data Analysis Basics', activity: 'Dataset analysis submitted', date: '2026-01-28' },
+                    { course: 'Machine Learning', activity: 'Model training completed', date: '2026-01-27' },
+                    { course: 'Deep Learning', activity: 'Neural network results', date: '2026-01-26' }
+                ]
+            },
+            'cybersecurity': {
+                courses: [
+                    { code: 'CS101', name: 'Security Fundamentals', students: 18, schedule: 'MWF 09:00-10:00' },
+                    { code: 'CS102', name: 'Network Security', students: 16, schedule: 'TTh 14:00-15:30' },
+                    { code: 'CS103', name: 'Penetration Testing', students: 14, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'Security Fundamentals', activity: 'Security audit completed', date: '2026-01-28' },
+                    { course: 'Network Security', activity: 'Vulnerability report submitted', date: '2026-01-27' },
+                    { course: 'Penetration Testing', activity: 'Lab exercise graded', date: '2026-01-26' }
+                ]
+            },
+            'cloud': {
+                courses: [
+                    { code: 'CLD101', name: 'Cloud Computing Basics', students: 26, schedule: 'MWF 09:00-10:00' },
+                    { code: 'CLD102', name: 'AWS Services', students: 24, schedule: 'TTh 14:00-15:30' },
+                    { code: 'CLD103', name: 'DevOps & Deployment', students: 22, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'Cloud Computing Basics', activity: 'Instance setup completed', date: '2026-01-28' },
+                    { course: 'AWS Services', activity: 'Infrastructure deployed', date: '2026-01-27' },
+                    { course: 'DevOps & Deployment', activity: 'Pipeline configured', date: '2026-01-26' }
+                ]
+            },
+            'ai': {
+                courses: [
+                    { code: 'AI101', name: 'AI Fundamentals', students: 28, schedule: 'MWF 10:00-11:00' },
+                    { code: 'AI102', name: 'Natural Language Processing', students: 22, schedule: 'TTh 13:00-14:30' },
+                    { code: 'AI103', name: 'Computer Vision', students: 20, schedule: 'MWF 14:00-15:00' }
+                ],
+                activities: [
+                    { course: 'AI Fundamentals', activity: 'Algorithm implementation completed', date: '2026-01-28' },
+                    { course: 'Natural Language Processing', activity: 'NLP model trained', date: '2026-01-27' },
+                    { course: 'Computer Vision', activity: 'Image processing results', date: '2026-01-26' }
+                ]
+            },
+            'animation': {
+                courses: [
+                    { code: 'AN101', name: 'Animation Basics', students: 16, schedule: 'MWF 09:00-10:00' },
+                    { code: 'AN102', name: '3D Animation', students: 14, schedule: 'TTh 14:00-15:30' },
+                    { code: 'AN103', name: 'Motion Graphics', students: 12, schedule: 'MWF 11:00-12:00' }
+                ],
+                activities: [
+                    { course: 'Animation Basics', activity: 'Keyframe animation project', date: '2026-01-28' },
+                    { course: '3D Animation', activity: 'Rendering process completed', date: '2026-01-27' },
+                    { course: 'Motion Graphics', activity: 'Video composition finished', date: '2026-01-26' }
+                ]
+            },
+            'marketing': {
+                courses: [
+                    { code: 'MK101', name: 'Digital Marketing Basics', students: 32, schedule: 'MWF 10:00-11:00' },
+                    { code: 'MK102', name: 'Social Media Strategy', students: 28, schedule: 'TTh 13:00-14:30' },
+                    { code: 'MK103', name: 'SEO & SEM', students: 25, schedule: 'MWF 14:00-15:00' }
+                ],
+                activities: [
+                    { course: 'Digital Marketing Basics', activity: 'Campaign strategy reviewed', date: '2026-01-28' },
+                    { course: 'Social Media Strategy', activity: 'Content calendar updated', date: '2026-01-27' },
+                    { course: 'SEO & SEM', activity: 'Analytics report published', date: '2026-01-26' }
+                ]
+            }
+        };
+
+        // Toggle between login and register forms
+        function switchForms(e) {
+            e.preventDefault();
+            document.getElementById('login-form').classList.toggle('hidden');
+            document.getElementById('register-form').classList.toggle('hidden');
+            clearMessages();
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error-msg');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-msg');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Override native alert to use in-page error box when available
+        (function overrideAlert() {
+            const nativeAlert = window.alert.bind(window);
+            window.alert = function(msg) {
+                try {
+                    if (typeof showError === 'function') {
+                        // Prefer the in-page error display
+                        showError(String(msg));
+                        return;
+                    }
+                } catch (e) {
+                    // Fall back to native alert on any issue
+                }
+                nativeAlert(msg);
+            };
+        })();
+
+        // Clear messages
+        function clearMessages() {
+            document.getElementById('error-msg').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'none';
+        }
+
+        // Handle login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/teacher/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('teacherToken', data.token);
+                    localStorage.setItem('teacherData', JSON.stringify(data.teacher));
+                    showSuccess('✅ Login successful! Loading dashboard...');
+                    setTimeout(() => {
+                        showTeacherDashboard(data.teacher);
+                    }, 1500);
+                } else {
+                    showError('❌ ' + (data.message || 'Login failed'));
+                }
+            } catch (error) {
+                showError('❌ Connection error: ' + error.message);
+            }
+        });
+
+        // Handle registration
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const phone = document.getElementById('register-phone').value;
+            const track = document.getElementById('register-department').value;
+            const specialization = document.getElementById('register-specialization').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/teacher/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, phone, track, specialization })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('✅ Registration successful! Please sign in.');
+                    setTimeout(() => {
+                        switchForms({ preventDefault: () => {} });
+                        document.getElementById('login-email').value = email;
+                    }, 1500);
+                } else {
+                    showError('❌ ' + (data.message || 'Registration failed'));
+                }
+            } catch (error) {
+                showError('❌ Connection error: ' + error.message);
+            }
+        });
+
+        // Show teacher dashboard
+        function showTeacherDashboard(teacher) {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+
+            // Set teacher name
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) userNameEl.textContent = teacher.name || 'Dr. Teacher';
+            
+            const userAvatarEl = document.querySelector('.user-avatar');
+            if (userAvatarEl) {
+                const initials = (teacher.name || '').split(' ').map(n => n[0]).join('').toUpperCase();
+                userAvatarEl.textContent = initials || 'DT';
+            }
+
+            // Load track-specific data
+            loadTrackSpecificData(teacher.track);
+
+            // Initialize dashboard functionality
+            initDashboard();
+        }
+
+        // Load track-specific courses and activities
+        async function loadTrackSpecificData(track) {
+            try {
+                // Load only from local courses.json (no API/Supabase)
+                let courses = [];
+                try {
+                    // Try multiple paths for courses.json
+                    let response;
+                    const paths = ['./courses.json', '/courses.json', '../courses.json'];
+                    
+                    for (const path of paths) {
+                        try {
+                            response = await fetch(path);
+                            if (response.ok) {
+                                break;
+                            }
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                    
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        // Filter courses by teacher's track
+                        const allCourses = data.courses || [];
+                        const trackNormalized = (track || '').toLowerCase();
+                        courses = allCourses.filter(c => 
+                            (c.track || '').toLowerCase() === trackNormalized
+                        );
+                        
+                        if (courses.length > 0) {
+                            console.log(`✅ Loaded ${courses.length} courses from courses.json for track: ${track}`);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not load from courses.json:', e.message);
+                }
+                
+                if (courses.length === 0) {
+                    console.warn('⚠️ No courses found in courses.json, using fallback data');
+                    loadFallbackTrackData(track);
+                    return;
+                }
+                
+                // Update stat cards
+                const coursesCount = document.getElementById('courses-count');
+                const studentsCount = document.getElementById('students-count');
+                
+                if (coursesCount) coursesCount.textContent = courses.length;
+                if (studentsCount) {
+                    const totalStudents = courses.reduce((sum, course) => sum + (course.students || 0), 0);
+                    studentsCount.textContent = totalStudents;
+                }
+
+                // Populate My Courses table
+                setTimeout(() => {
+                    const coursesTableBody = document.querySelector('#my-courses-section tbody');
+                    if (coursesTableBody) {
+                        coursesTableBody.innerHTML = courses.map(course => {
+                            const createdDate = new Date(course.created_at).toLocaleDateString();
+                            const updatedDate = new Date(course.updated_at).toLocaleDateString();
+                            return `
+                            <tr>
+                                <td>${course.id || 'N/A'}</td>
+                                <td>${course.code}</td>
+                                <td>${course.name}</td>
+                                <td>${course.description || 'N/A'}</td>
+                                <td>${course.instructor || 'N/A'}</td>
+                                <td>${course.schedule || 'TBD'}</td>
+                                <td>${course.students || 0}</td>
+                                <td>${course.track || 'N/A'}</td>
+                                <td>${createdDate}</td>
+                                <td>${updatedDate}</td>
+                                <td><button class="btn-small btn-start">Start</button></td>
+                            </tr>
+                        `}).join('');
+                    }
+
+                    // Populate class select for scheduling
+                    try {
+                        const courseSelect = document.getElementById('class-course');
+                        if (courseSelect) {
+                            courseSelect.innerHTML = (courses || []).map(c => {
+                                const code = c.code || c.id || c.code;
+                                const name = c.name || c.title || '';
+                                return `<option value="${code}|${name}">${code} — ${name}</option>`;
+                            }).join('') || '<option value="">No courses available</option>';
+                        }
+                    } catch (e) {
+                        console.warn('Could not populate class select:', e.message);
+                    }
+
+                    // Populate Recent Activities table
+                    const activitiesTableBody = document.querySelector('#dashboard-section table tbody');
+                    if (activitiesTableBody && courses.length > 0) {
+                        activitiesTableBody.innerHTML = courses.slice(0, 3).map(course => `
+                            <tr>
+                                <td>${course.name}</td>
+                                <td>Course content updated</td>
+                                <td>${new Date(course.updated_at).toLocaleDateString()}</td>
+                                <td><span class="status-success">✅ Active</span></td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    // After populating the table, check server schedules so UI persists across reloads
+                    try {
+                        const rows = Array.from((courses || []).map(c=>c.code));
+                        rows.forEach(code => {
+                            if (code) checkCourseScheduleAndUpdateButton(code);
+                        });
+                    } catch (e) { console.warn('Schedule check error:', e.message); }
+                }, 100);
+            } catch (error) {
+                console.error('Error loading track data:', error);
+                // Fallback to static data
+                loadFallbackTrackData(track);
+            }
+        }
+
+        // Check server schedule for a course and update Manage->Start when appropriate
+        async function checkCourseScheduleAndUpdateButton(courseCode) {
+            try {
+                // Force teacher action buttons to be "Start" permanently.
+                // We still optionally fetch schedule to attach meetingId elsewhere, but we won't revert to "Manage".
+                try {
+                    const resp = await fetch(`${API_URL}/api/class/schedule/${encodeURIComponent(courseCode)}`);
+                    if (resp.ok) {
+                        const data = await resp.json().catch(()=>({}));
+                        const schedules = data && Array.isArray(data.schedules) ? data.schedules : [];
+                        if (schedules.length > 0 && schedules[0].meetingId) {
+                            // attach meeting id to any matching row button if present
+                            const rows = Array.from(document.querySelectorAll('#my-courses-section tbody tr, #my-courses-section table tbody tr'));
+                            rows.forEach(row => {
+                                const tds = Array.from(row.querySelectorAll('td'));
+                                const found = tds.some(td => (td.textContent || '').trim() === (courseCode || '').trim());
+                                if (!found) return;
+                                const btn = row.querySelector('button');
+                                if (btn) btn.dataset.meetingId = schedules[0].meetingId;
+                            });
+                        }
+                    }
+                } catch (e) { /* ignore schedule fetch errors */ }
+
+                // Always set to Start so teacher sees Start action (no automatic reversion to Manage)
+                updateCourseButtonToStart(courseCode, true);
+            } catch (e) {
+                console.warn('Schedule check error (forced start):', e.message || e);
+            }
+        }
+
+        // Fallback function for static track data
+        function loadFallbackTrackData(track) {
+            const trackData = trackCoursesMap[track] || trackCoursesMap['web-dev'];
+            
+            // Update stat cards
+            const coursesCount = document.getElementById('courses-count');
+            const studentsCount = document.getElementById('students-count');
+            
+            if (coursesCount) coursesCount.textContent = trackData.courses.length;
+            if (studentsCount) {
+                const totalStudents = trackData.courses.reduce((sum, course) => sum + course.students, 0);
+                studentsCount.textContent = totalStudents;
+            }
+
+            // Populate My Courses table
+            setTimeout(() => {
+                const coursesTableBody = document.querySelector('#my-courses-section tbody');
+                if (coursesTableBody) {
+                    coursesTableBody.innerHTML = trackData.courses.map(course => `
+                        <tr>
+                            <td>${course.code}</td>
+                            <td>${course.name}</td>
+                            <td>${course.students}</td>
+                            <td>${course.schedule}</td>
+                            <td><button class="btn-small btn-start">Start</button></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Populate Recent Activities table
+                const activitiesTableBody = document.querySelector('#dashboard-section table tbody');
+                if (activitiesTableBody) {
+                    activitiesTableBody.innerHTML = trackData.activities.map(activity => `
+                        <tr>
+                            <td>${activity.course}</td>
+                            <td>${activity.activity}</td>
+                            <td>${activity.date}</td>
+                            <td><span class="status-success">✅ Active</span></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // After populating fallback table, check server schedules for persistence
+                try {
+                    (trackData.courses || []).forEach(c => {
+                        if (c && c.code) checkCourseScheduleAndUpdateButton(c.code);
+                    });
+                } catch (e) { console.warn('Fallback schedule check error:', e.message); }
+            }, 100);
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            setupNavigation();
+            setupButtons();
+        }
+
+        // Update Manage -> Start (or revert) for a course in the UI
+        function updateCourseButtonToStart(courseCode, toStart = true) {
+            try {
+                const rows = Array.from(document.querySelectorAll('#my-courses-section tbody tr, #my-courses-section table tbody tr'));
+                rows.forEach(row => {
+                    // find any td that contains the courseCode
+                    const tds = Array.from(row.querySelectorAll('td'));
+                    const found = tds.some(td => (td.textContent || '').trim() === (courseCode || '').trim());
+                    if (!found) return;
+
+                    const btn = row.querySelector('button');
+                    if (!btn) return;
+
+                    if (toStart) {
+                        btn.textContent = 'Start';
+                        btn.classList.add('btn-start');
+                        btn.classList.remove('btn-view');
+                        btn.dataset.course = courseCode;
+                        btn.onclick = (e) => { e.preventDefault(); startCourseClass(courseCode); };
+                    } else {
+                        btn.textContent = 'Manage';
+                        btn.classList.remove('btn-start');
+                        btn.classList.add('btn-view');
+                        btn.dataset.course = courseCode;
+                        btn.onclick = (e) => { e.preventDefault(); openManageCourseSchedule(courseCode); };
+                    }
+                });
+            } catch (e) {
+                console.warn('Could not update course button:', e.message || e);
+            }
+        }
+
+        // Setup navigation
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const pageTitle = document.getElementById('page-title');
+
+            const navigationTitles = {
+                'dashboard': 'Dashboard',
+                'my-courses': 'My Courses',
+                'assignments': 'Assignments',
+                'grades': 'Grades',
+                'students': 'Students',
+                'announcements': 'Announcements'
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (link.classList.contains('logout')) {
+                        handleLogout();
+                        return;
+                    }
+
+                    e.preventDefault();
+                    const sectionName = link.getAttribute('data-section');
+                    if (!sectionName) return;
+
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    contentSections.forEach(section => section.classList.remove('active'));
+
+                    const selectedSection = document.getElementById(`${sectionName}-section-content`) || 
+                                           document.getElementById(`${sectionName}-section`);
+                    if (selectedSection) {
+                        selectedSection.classList.add('active');
+                        pageTitle.textContent = navigationTitles[sectionName] || 'Dashboard';
+                    }
+                });
+            });
+
+            // Add course button handler
+            const addCourseBtn = document.getElementById('add-course-btn');
+            if (addCourseBtn) addCourseBtn.addEventListener('click', () => openAddCourseModal());
+
+            // Delegate Manage buttons (since they're added dynamically)
+            document.addEventListener('click', (e) => {
+                if (e.target && e.target.classList && (e.target.classList.contains('btn-view') || e.target.classList.contains('btn-start'))) {
+                    const row = e.target.closest('tr');
+                    if (!row) return;
+                    const code = row.children[1]?.textContent?.trim();
+                    
+                    // Check if it's a Start button or Manage button
+                    if (e.target.classList.contains('btn-start')) {
+                        startCourseClass(code);
+                    } else {
+                        openManageCourseSchedule(code);
+                    }
+
+                }
+            });
+        }
+
+        // Setup buttons
+        function setupButtons() {
+            const buttons = document.querySelectorAll('.btn-view');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    alert('Action: ' + btn.textContent);
+                });
+            });
+
+            // Setup Schedule Class Buttons
+            setupScheduleClassHandlers();
+        }
+
+        // Setup Schedule Class handlers
+        function setupScheduleClassHandlers() {
+            const sendBtn = document.getElementById('send-class-notification');
+            const resetBtn = document.getElementById('reset-schedule');
+
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendClassNotification);
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetScheduleForm);
+            }
+
+            // Load and display scheduled classes
+            loadScheduledClasses();
+        }
+
+        // Send notification to all students
+        async function sendClassNotification() {
+            const courseSelect = document.getElementById('class-course');
+            const dateInput = document.getElementById('class-date');
+            const timeInput = document.getElementById('class-time');
+            const topicInput = document.getElementById('class-topic');
+            const descriptionInput = document.getElementById('class-description');
+            const durationInput = document.getElementById('class-duration');
+
+            // Validate form
+            if (!courseSelect.value || !dateInput.value || !timeInput.value || !topicInput.value) {
+                alert('❌ Please fill in all required fields!');
+                return;
+            }
+
+            const [courseCode, courseName] = courseSelect.value.split('|');
+            const classDate = dateInput.value;
+            const classTime = timeInput.value;
+            const classTopic = topicInput.value;
+            const classDescription = descriptionInput.value;
+            const duration = durationInput.value;
+
+            // Get list of enrolled students for this course
+            const studentEmails = await getStudentEmailsForCourse(courseCode);
+
+            // Create class object
+            const classSession = {
+                id: 'CLASS-' + Date.now(),
+                courseCode: courseCode,
+                courseName: courseName,
+                date: classDate,
+                time: classTime,
+                topic: classTopic,
+                description: classDescription,
+                duration: duration,
+                meetingId: generateMeetingId(),
+                status: 'pending',
+                sentAt: new Date().toISOString(),
+                studentEmails: studentEmails
+            };
+
+            try {
+                // Save to localStorage
+                const scheduledClasses = JSON.parse(localStorage.getItem('scheduledClasses') || '[]');
+                scheduledClasses.push(classSession);
+                localStorage.setItem('scheduledClasses', JSON.stringify(scheduledClasses));
+
+                // Call backend API to send real emails
+                const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+                const teacherId = teacher.id || teacher.userId || teacher.email || null;
+
+                const response = await fetch(`${API_URL}/api/class/schedule`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        courseCode: classSession.courseCode,
+                        courseName: classSession.courseName,
+                        startDate: classSession.date,
+                        startTime: classSession.time,
+                        endTime: '',
+                        frequency: 'once',
+                        location: 'Online',
+                        studentEmails: classSession.studentEmails,
+                        teacherId: teacherId,
+                        meetingId: classSession.meetingId
+                    })
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (err) {
+                    console.error('Failed to parse response JSON:', err.message);
+                    data = {};
+                }
+
+                if (!response.ok || !data.success) {
+                    console.warn('API scheduling responded with error or network failure:', data);
+                    // still show local success but warn user with error details
+                    alert(`⚠️ Notification queued locally, but server email may have failed.\n\nSaved locally for ${classSession.studentEmails.length} students.\n\nServer response: ${data.message || response.statusText || 'No details'}.`);
+                    try { updateCourseButtonToStart(courseCode); } catch (e) { console.warn('Could not update course button:', e.message); }
+                } else {
+                    alert(`✅ Notification sent successfully!\n\nClass: ${courseName}\nDate: ${classDate}\nTime: ${classTime}\nTopic: ${classTopic}\n\nMeeting ID: ${classSession.meetingId}\n\nEmails sent to ${classSession.studentEmails.length} students`);
+                    try { updateCourseButtonToStart(courseCode); } catch (e) { console.warn('Could not update course button:', e.message); }
+                }
+
+                // Reload scheduled classes table
+                loadScheduledClasses();
+
+                // Reset form
+                resetScheduleForm();
+
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                alert('❌ Failed to send notification. Please try again.');
+            }
+        }
+
+        // Get student emails for a specific course
+        // This tries several sources (local registration data, user.json) and returns
+        // only real email addresses. If none are found it returns an empty array
+        // (so the server won't attempt to send to placeholder @apkl.edu addresses).
+        async function getStudentEmailsForCourse(courseCode) {
+            try {
+                // 1) Check for explicit per-course registration list in localStorage
+                const regKey = `registered_students_${courseCode}`;
+                const regList = JSON.parse(localStorage.getItem(regKey) || 'null');
+                if (Array.isArray(regList) && regList.length > 0) {
+                    return regList.filter(Boolean).map(String);
+                }
+
+                // 2) Check an all_students list in localStorage (common in this app)
+                const allStudents = JSON.parse(localStorage.getItem('all_students') || '[]');
+                if (Array.isArray(allStudents) && allStudents.length > 0) {
+                    const emails = allStudents
+                        .filter(s => Array.isArray(s.registered_courses) ? s.registered_courses.includes(courseCode) : false)
+                        .map(s => s.email)
+                        .filter(Boolean);
+                    if (emails.length > 0) return emails;
+                }
+
+                // 3) Try to fetch local `user.json` (bundled sample users) and use registered_courses
+                try {
+                    const resp = await fetch('./user.json');
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        const users = data.users || [];
+                        const emails = users
+                            .filter(u => Array.isArray(u.registered_courses) ? u.registered_courses.includes(courseCode) : false)
+                            .map(u => u.email)
+                            .filter(Boolean);
+                        if (emails.length > 0) return emails;
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch user.json for student emails:', e.message);
+                }
+
+                // 4) As a last resort do not return placeholder apkl.edu addresses — return empty list
+                return [];
+            } catch (e) {
+                console.error('Error determining student emails for course', courseCode, e.message);
+                return [];
+            }
+        }
+
+        // Simulate sending emails to students
+        async function simulateSendEmails(classSession) {
+            return new Promise((resolve) => {
+                // Simulate email sending delay
+                setTimeout(() => {
+                    console.log('📧 Emails sent to:');
+                    classSession.studentEmails.forEach(email => {
+                        console.log(`   ✓ ${email}`);
+                        console.log(`     Subject: Class Scheduled - ${classSession.courseName}`);
+                        console.log(`     Content: Your class "${classSession.topic}" is scheduled for ${classSession.date} at ${classSession.time}`);
+                        console.log(`     Meeting ID: ${classSession.meetingId}`);
+                    });
+                    resolve();
+                }, 1000);
+            });
+        }
+
+        // Show recipient selection modal and return selected emails (Promise)
+        function promptSelectRecipients(users) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('select-recipients-modal');
+                const list = document.getElementById('recipients-list');
+                list.innerHTML = '';
+
+                (users || []).forEach(u => {
+                    const div = document.createElement('div');
+                    const checkboxId = 'recip_' + Math.random().toString(36).slice(2,8);
+                    div.innerHTML = `
+                        <label style="display:flex; gap:10px; align-items:center;">
+                            <input type="checkbox" id="${checkboxId}" data-email="${(u.email||'').replace(/\"/g,'')}" ${u.payment_status==='completed'?'checked':''}>
+                            <div style="flex:1;"><strong>${u.full_name || u.email}</strong><div style="color:#666; font-size:12px;">${u.email} ${u.payment_status? ' • ' + u.payment_status : ''}</div></div>
+                        </label>
+                    `;
+                    list.appendChild(div);
+                });
+
+                modal.classList.remove('hidden');
+
+                const onCancel = () => { cleanup(); resolve([]); };
+                const onConfirm = () => {
+                    const checked = Array.from(list.querySelectorAll('input[type=checkbox]:checked'))
+                        .map(cb => cb.dataset.email).filter(Boolean);
+                    cleanup();
+                    resolve(checked);
+                };
+
+                function cleanup() {
+                    modal.classList.add('hidden');
+                    document.getElementById('recipients-cancel').removeEventListener('click', onCancel);
+                    document.getElementById('recipients-confirm').removeEventListener('click', onConfirm);
+                }
+
+                document.getElementById('recipients-cancel').addEventListener('click', onCancel);
+                document.getElementById('recipients-confirm').addEventListener('click', onConfirm);
+            });
+        }
+
+        // Load and display scheduled classes
+        function loadScheduledClasses() {
+            const tbody = document.getElementById('scheduled-classes-list');
+            if (!tbody) return;
+
+            const scheduledClasses = JSON.parse(localStorage.getItem('scheduledClasses') || '[]');
+
+            tbody.innerHTML = '';
+
+            if (scheduledClasses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999; padding: 20px;">No scheduled classes yet</td></tr>';
+                return;
+            }
+
+            scheduledClasses.forEach((classSession, index) => {
+                const dateTime = new Date(classSession.date + 'T' + classSession.time);
+                const now = new Date();
+                const isPast = dateTime < now;
+                const status = isPast ? 'completed' : classSession.status;
+                const statusClass = `status-${status}`;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${classSession.courseName}</td>
+                    <td>${classSession.topic}</td>
+                    <td>${classSession.date} ${classSession.time}</td>
+                    <td>${classSession.duration} min</td>
+                    <td><span class="${statusClass}">${status.toUpperCase()}</span></td>
+                    <td>
+                        ${!isPast ? `<button class="btn-small btn-start" data-class-id="${index}">▶ Start</button>` : '<span style="color: #999;">Completed</span>'}
+                        <button class="btn-small btn-cancel" data-class-id="${index}">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Add event listeners to action buttons
+            document.querySelectorAll('.btn-start').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const classId = btn.dataset.classId;
+                    startZoomClass(classId);
+                });
+            });
+
+            document.querySelectorAll('.btn-cancel').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const classId = btn.dataset.classId;
+                    deleteScheduledClass(classId);
+                });
+            });
+        }
+
+        // Start Zoom class
+        function startZoomClass(classIndex) {
+            const scheduledClasses = JSON.parse(localStorage.getItem('scheduledClasses') || '[]');
+            const classSession = scheduledClasses[classIndex];
+
+            if (!classSession) {
+                alert('❌ Class not found!');
+                return;
+            }
+
+            // Update status to active
+            classSession.status = 'active';
+            scheduledClasses[classIndex] = classSession;
+            localStorage.setItem('scheduledClasses', JSON.stringify(scheduledClasses));
+
+            // Open video call modal
+            const videoCallModal = document.getElementById('video-call-modal');
+            if (videoCallModal) {
+                videoCallModal.classList.remove('hidden');
+
+                // Set meeting info
+                document.getElementById('meeting-title').textContent = classSession.courseName + ' - ' + classSession.topic;
+                document.getElementById('meeting-code').textContent = 'Meeting ID: ' + classSession.meetingId;
+
+                // Initialize video call
+                initializeVideoCall(classSession.meetingId, classSession);
+
+                // Start recording indication
+                console.log('🎥 Zoom class started: ' + classSession.courseName);
+            }
+        }
+
+        // Initialize video call
+        async function initializeVideoCall(meetingId, classSession) {
+            // Persist active class state BEFORE requesting media (so it survives even if camera fails)
+            try {
+                if (typeof classSession === 'string') videoCallState.currentCourseCode = classSession;
+                else if (classSession && classSession.courseCode) videoCallState.currentCourseCode = classSession.courseCode;
+                else if (classSession && classSession.code) videoCallState.currentCourseCode = classSession.code;
+            } catch (e) {}
+
+            // Save state to localStorage FIRST (before camera permission)
+            localStorage.setItem('activeTeacherClass', JSON.stringify({
+                meetingId: meetingId,
+                courseCode: videoCallState.currentCourseCode,
+                startedAt: new Date().toISOString()
+            }));
+
+            try {
+                // Try to request camera and microphone permissions (optional)
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+                        audio: true
+                    });
+
+                    // Display teacher video
+                    const videoElement = document.getElementById('teacher-video');
+                    if (videoElement) {
+                        videoElement.srcObject = stream;
+                    }
+
+                    // Store stream for later
+                    videoCallState.localStream = stream;
+                    videoCallState.isActive = true;
+                    videoCallState.meetingId = meetingId;
+
+                    console.log('✅ Video call initialized with camera/mic for meeting: ' + meetingId);
+                } catch (mediaError) {
+                    // Camera/mic not available, but allow class to continue
+                    console.warn('⚠️ Camera/microphone not available, continuing without them:', mediaError.message);
+                    videoCallState.isActive = true;
+                    videoCallState.meetingId = meetingId;
+                    console.log('✅ Video call initialized (audio/video optional) for meeting: ' + meetingId);
+                    
+                    // Show a banner that camera/mic is disabled
+                    const statusBadge = document.getElementById('teacher-mute-status');
+                    if (statusBadge) {
+                        statusBadge.textContent = '⚠️ No Camera/Mic';
+                        statusBadge.style.background = 'rgba(255, 152, 0, 0.8)';
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error initializing video call:', error);
+                // Still allow the class to start
+                videoCallState.isActive = true;
+                videoCallState.meetingId = meetingId;
+                console.log('✅ Video call initialized (demo mode) for meeting: ' + meetingId);
+            }
+        }
+
+        // Delete scheduled class
+        function deleteScheduledClass(classIndex) {
+            if (confirm('Are you sure you want to delete this scheduled class?')) {
+                const scheduledClasses = JSON.parse(localStorage.getItem('scheduledClasses') || '[]');
+                scheduledClasses.splice(classIndex, 1);
+                localStorage.setItem('scheduledClasses', JSON.stringify(scheduledClasses));
+                loadScheduledClasses();
+                alert('✅ Scheduled class deleted');
+            }
+        }
+
+        // Reset schedule form
+        function resetScheduleForm() {
+            document.getElementById('class-course').value = '';
+            document.getElementById('class-date').value = '';
+            document.getElementById('class-time').value = '';
+            document.getElementById('class-topic').value = '';
+            document.getElementById('class-description').value = '';
+            document.getElementById('class-duration').value = '60';
+        }
+
+        // Open Add Course Modal
+        async function openAddCourseModal() {
+            const modal = document.getElementById('course-modal');
+            if (!modal) return;
+            
+            const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+            const track = teacher.track || 'webdev';
+            
+            modal.classList.remove('hidden');
+            document.getElementById('course-modal-title').textContent = 'Add Course';
+            document.getElementById('course-form').dataset.mode = 'add';
+            
+            // Populate track field (read-only)
+            document.getElementById('course-track').value = track;
+            
+            // Clear form fields
+            document.getElementById('course-id').value = '';
+            document.getElementById('course-name').value = '';
+            document.getElementById('course-description').value = '';
+            document.getElementById('course-instructor').value = teacher.name || '';
+            document.getElementById('course-schedule').value = '';
+            document.getElementById('course-students').value = '0';
+            
+            // Generate next course code based on track
+            try {
+                const nextCode = await generateNextCourseCode(track);
+                document.getElementById('course-code').value = nextCode;
+                const id = generateCourseId(nextCode, track);
+                document.getElementById('course-id').value = id;
+            } catch (error) {
+                console.error('Error generating course code:', error);
+                document.getElementById('course-code').value = '';
+            }
+        }
+
+        // Map tracks to course code prefixes
+        const trackCodePrefixes = {
+            'fullstack': 'FS',
+            'webdev': 'WEB',
+            'mobiledev': 'MOB',
+            'datascience': 'DS',
+            'cybersecurity': 'CS',
+            'cloud': 'CLD',
+            'ai': 'AI',
+            'animation': 'AN',
+            'marketing': 'MK',
+            'uiux': 'UI'
+        };
+
+        // Generate next course code for a track
+        async function generateNextCourseCode(track) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5002/api/courses?track=${track}`);
+                const data = await response.json();
+                
+                if (!data.success || !data.courses) {
+                    // If API fails, return default
+                    const prefix = trackCodePrefixes[track] || 'CRS';
+                    return `${prefix}101`;
+                }
+
+                const courses = data.courses;
+                const prefix = trackCodePrefixes[track] || 'CRS';
+                
+                // Extract numbers from existing codes and find the highest
+                const numbers = courses
+                    .filter(c => c.code.startsWith(prefix))
+                    .map(c => {
+                        const match = c.code.match(/\d+$/);
+                        return match ? parseInt(match[0]) : 0;
+                    });
+
+                const maxNumber = Math.max(...numbers, 100); // Start from 101 if no courses
+                const nextNumber = maxNumber + 1;
+                
+                return `${prefix}${nextNumber}`;
+            } catch (error) {
+                console.error('Error generating course code:', error);
+                const prefix = trackCodePrefixes[track] || 'CRS';
+                return `${prefix}101`;
+            }
+        }
+
+        // Open Manage Course Modal
+        function openManageCourseModal(code) {
+            // Open the manage schedule modal instead
+            openManageCourseSchedule(code);
+        }
+
+        // Open Manage Course Schedule Modal
+        async function openManageCourseSchedule(code) {
+            const scheduleModal = document.getElementById('manage-schedule-modal');
+            if (!scheduleModal) {
+                alert('❌ Schedule modal not found!');
+                return;
+            }
+
+            if (!code || code === '') {
+                alert('❌ Invalid course code!');
+                return;
+            }
+
+            const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+            
+            // Lookup course
+            const savedCourses = JSON.parse(localStorage.getItem('teacher_courses_' + (teacher.id||'default')) || 'null');
+            let course = null;
+            if (savedCourses) course = savedCourses.find(c=>c.code===code);
+            if (!course) {
+                const track = teacher.track || 'web-dev';
+                const trackData = trackCoursesMap[track] || trackCoursesMap['web-dev'];
+                if (trackData && trackData.courses) {
+                    course = trackData.courses.find(c=>c.code===code) || null;
+                }
+            }
+            
+            // Fallback: Try to fetch from backend courses.json via API
+            if (!course) {
+                try {
+                    const response = await fetch(`${window.appConfig?.API_URL || 'http://127.0.0.1:5002'}/api/courses`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.courses && Array.isArray(data.courses)) {
+                            course = data.courses.find(c => c.code === code) || null;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Could not fetch courses from API:', err.message);
+                }
+            }
+
+            if (!course) {
+                alert(`❌ Course with code "${code}" not found!`);
+                return;
+            }
+
+            // Populate modal fields
+            document.getElementById('manage-schedule-title').textContent = `Manage Schedule - ${course.name}`;
+            document.getElementById('manage-course-name').value = course.name || '';
+            document.getElementById('manage-course-code').value = course.code || '';
+
+            // Load saved schedule if exists
+            const savedSchedules = JSON.parse(localStorage.getItem('course_schedules') || '{}');
+            const courseSchedule = savedSchedules[code] || {};
+
+            document.getElementById('manage-start-date').value = courseSchedule.startDate || '';
+            document.getElementById('manage-start-time').value = courseSchedule.startTime || '';
+            document.getElementById('manage-end-date').value = courseSchedule.endDate || '';
+            document.getElementById('manage-end-time').value = courseSchedule.endTime || '';
+            document.getElementById('manage-frequency').value = courseSchedule.frequency || '';
+            document.getElementById('manage-location').value = courseSchedule.location || '';
+
+            // Store the course code for form submission
+            document.getElementById('manage-schedule-form').dataset.courseCode = code;
+
+            scheduleModal.classList.remove('hidden');
+        }
+
+        // Close modal helper
+        document.getElementById('cancel-course').addEventListener('click', ()=>{
+            document.getElementById('course-modal').classList.add('hidden');
+        });
+
+        // Auto-generate course ID based on code and track
+        document.getElementById('course-code').addEventListener('input', (e) => {
+            const code = e.target.value.trim();
+            const track = document.getElementById('course-track').value.trim();
+            if (code && track) {
+                const id = generateCourseId(code, track);
+                document.getElementById('course-id').value = id;
+            }
+        });
+
+        // Generate auto ID for course based on code
+        function generateCourseId(code, track) {
+            // Format: CODE-1 (e.g., FS101-1)
+            return `${code}-1`;
+        }
+
+        // Handle form submit (Save Course to Backend)
+        document.getElementById('course-form').addEventListener('submit', async (e)=>{
+            e.preventDefault();
+            const mode = e.target.dataset.mode || 'add';
+            
+            const code = document.getElementById('course-code').value.trim();
+            const name = document.getElementById('course-name').value.trim();
+            const description = document.getElementById('course-description').value.trim();
+            const instructor = document.getElementById('course-instructor').value.trim();
+            const schedule = document.getElementById('course-schedule').value.trim();
+            const students = parseInt(document.getElementById('course-students').value) || 0;
+            const track = document.getElementById('course-track').value.trim();
+
+            // Validate required fields
+            if (!code || !name || !instructor || !schedule || !track) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+            const id = generateCourseId(code, track);
+            const now = new Date().toISOString();
+
+            // Prepare course object matching API schema
+            const courseObj = {
+                id,
+                code,
+                name,
+                description,
+                instructor,
+                schedule,
+                students,
+                track,
+                created_at: now,
+                updated_at: now
+            };
+
+            try {
+                // First try to save to backend API to update courses.json
+                const apiResponse = await fetch(`${API_URL}/api/courses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(courseObj)
+                });
+
+                if (apiResponse.ok) {
+                    const apiResult = await apiResponse.json();
+                    if (apiResult.success) {
+                        alert('✅ Course saved to courses.json successfully!');
+                        document.getElementById('course-modal').classList.add('hidden');
+                        document.getElementById('course-form').reset();
+                        
+                        // Reload courses for current track
+                        loadTrackSpecificData(track);
+                        return;
+                    }
+                }
+                
+                // Fallback: Save to localStorage if API fails
+                console.warn('⚠️ API save failed, falling back to localStorage');
+                const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+                const storageKey = 'teacher_courses_' + (teacher.id || 'default');
+                let savedCourses = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                
+                const mode = e.target.dataset.mode || 'add';
+                
+                if (mode === 'add') {
+                    // Check for duplicate codes
+                    if (savedCourses.some(c => c.code === courseObj.code)) {
+                        alert('❌ Course code already exists');
+                        return;
+                    }
+                    savedCourses.push(courseObj);
+                } else {
+                    // Update existing course
+                    const idx = savedCourses.findIndex(c => c.code === courseObj.code);
+                    if (idx !== -1) {
+                        savedCourses[idx] = courseObj;
+                    } else {
+                        savedCourses.push(courseObj);
+                    }
+                }
+                
+                // Save to localStorage
+                localStorage.setItem(storageKey, JSON.stringify(savedCourses));
+                alert('✅ Course saved to localStorage!');
+                document.getElementById('course-modal').classList.add('hidden');
+                document.getElementById('course-form').reset();
+                
+                // Reload courses for current track
+                loadTrackSpecificData(track);
+            } catch (error) {
+                console.error('Error saving course:', error);
+                // Show a friendly, visible message in the UI for network/save failures
+                // Standardize message to "Fail to fetch" for that specific case
+                const msg = (error && error.message && error.message.toLowerCase().includes('failed to fetch')) ? '❌ Fail to fetch' : ('❌ Error saving course: ' + (error.message || 'Unknown error'));
+                try { showError(msg); } catch (e) { alert(msg); }
+            }
+        });
+        
+        // Send class notification to all enrolled students
+        function sendClassNotificationToStudents(courseObj, teacher) {
+            // Get all students from localStorage
+            const allStudents = JSON.parse(localStorage.getItem('all_students') || '[]');
+            
+            // Filter students enrolled in this course
+            const enrolledStudents = allStudents.filter(s => {
+                const studentCourses = JSON.parse(localStorage.getItem('student_courses_' + s.id) || '[]');
+                return studentCourses.some(c => c.code === courseObj.code);
+            });
+            
+            if (enrolledStudents.length === 0) {
+                alert('✅ Class scheduled! (No students enrolled yet)');
+                return;
+            }
+            
+            // Create class activity for each student
+            enrolledStudents.forEach(student => {
+                const classActivity = {
+                    id: courseObj.meeting.id,
+                    course: courseObj.code,
+                    title: courseObj.name,
+                    type: 'class_session',
+                    teacher: teacher.name,
+                    date: courseObj.session.date,
+                    time: courseObj.session.time,
+                    meetingId: courseObj.meeting.id,
+                    status: 'scheduled',
+                    createdAt: courseObj.meeting.createdAt
+                };
+                
+                // Add to student's class activities
+                const activitiesKey = 'student_activities_' + student.id;
+                let activities = JSON.parse(localStorage.getItem(activitiesKey) || '[]');
+                activities.push(classActivity);
+                localStorage.setItem(activitiesKey, JSON.stringify(activities));
+            });
+            
+            alert(`✅ Class sent to ${enrolledStudents.length} students! It will appear in their dashboard.`);
+        }
+
+        function saveCourseToStorage(mode, courseObj, savedArray, storageKey) {
+            if (mode === 'add') {
+                // prevent duplicate codes
+                if (savedArray.some(c=>c.code === courseObj.code)) {
+                    alert('Course code already exists');
+                    return;
+                }
+                savedArray.push(courseObj);
+            } else {
+                const idx = savedArray.findIndex(c=>c.code===courseObj.code);
+                if (idx === -1) savedArray.push(courseObj);
+                else savedArray[idx] = Object.assign({}, savedArray[idx], courseObj);
+            }
+            localStorage.setItem(storageKey, JSON.stringify(savedArray));
+            // refresh table
+            const currentTeacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+            loadTrackSpecificData(currentTeacher.track);
+            document.getElementById('course-modal').classList.add('hidden');
+        }
+
+        // Post announcement
+        function postAnnouncement() {
+            const text = document.getElementById('announcement-text').value;
+            if (!text.trim()) {
+                showError('❌ Please write an announcement');
+                return;
+            }
+            alert('✅ Announcement posted successfully!');
+            document.getElementById('announcement-text').value = '';
+        }
+
+        // Logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('teacherToken');
+                localStorage.removeItem('teacherData');
+                window.location.href = 'teacher.html';
+            }
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const teacherToken = localStorage.getItem('teacherToken');
+            const teacherData = JSON.parse(localStorage.getItem('teacherData') || 'null');
+
+            // Check if teacher was in an active class before refresh (do this FIRST before showing dashboard)
+            const activeClass = JSON.parse(localStorage.getItem('activeTeacherClass') || 'null');
+            const wasInActiveClass = activeClass && activeClass.meetingId;
+
+            if (teacherToken && teacherData) {
+                showTeacherDashboard(teacherData);
+            }
+            
+            // If teacher was in active class, restore it now
+            if (wasInActiveClass) {
+                console.log('📹 Restoring active class session:', activeClass.meetingId);
+                // Open video call modal and restore state (don't re-request camera)
+                try {
+                    const videoCallModal = document.getElementById('video-call-modal');
+                    if (videoCallModal) {
+                        videoCallModal.classList.remove('hidden');
+                        videoCallState.meetingId = activeClass.meetingId;
+                        videoCallState.currentCourseCode = activeClass.courseCode;
+                        videoCallState.isActive = true;
+                        
+                        // Update meeting info in modal
+                        document.getElementById('meeting-title').textContent = `${activeClass.courseCode} - Resumed Session`;
+                        document.getElementById('meeting-code').textContent = 'Meeting ID: ' + activeClass.meetingId;
+                        
+                        console.log('✅ Active class session restored (video view open)');
+                    }
+                } catch (e) {
+                    console.error('Failed to restore active class:', e);
+                }
+            }
+            
+            // Connect WebSocket for real-time updates for teacher
+            try { connectTeacherWebSocket(); } catch (e) { console.warn('WebSocket init failed:', e.message); }
+        });
+
+        // WebSocket for teacher real-time updates
+        let teacherWs = null;
+        const teacherPeerConnections = new Map(); // studentId -> RTCPeerConnection
+        const teacherRemoteElements = new Map(); // studentId -> audio/video element
+        function connectTeacherWebSocket() {
+            const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+            const userId = teacher.id || teacher.userId || teacher.email;
+            if (!userId) return;
+
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//127.0.0.1:5002`;
+            teacherWs = new WebSocket(wsUrl);
+
+            teacherWs.onopen = () => {
+                console.log('✅ Teacher connected to WebSocket');
+                teacherWs.send(JSON.stringify({ type: 'subscribe', userId }));
+            };
+
+            teacherWs.onmessage = (ev) => {
+                try {
+                    const msg = JSON.parse(ev.data);
+                    if (!msg || !msg.type) return;
+
+                    if (msg.type === 'class_scheduled') {
+                        // Server indicates emails were sent and class is scheduled — switch Manage -> Start
+                        console.log('📣 class_scheduled received for', msg.courseCode);
+                        updateCourseButtonToStart(msg.courseCode);
+                        loadScheduledClasses();
+                    }
+
+                    if (msg.type === 'class_started') {
+                        console.log('📣 class_started received for', msg.courseCode);
+                        updateCourseButtonToStart(msg.courseCode);
+                    }
+
+                    if (msg.type === 'class_ended') {
+                        console.log('📣 class_ended received for', msg.courseCode);
+                        try { updateCourseButtonToStart(msg.courseCode, false); } catch(e) { console.warn(e.message); }
+                        loadScheduledClasses();
+                    }
+
+                    // Generic participant joined (any participant joined meeting)
+                    if (msg.type === 'participant_joined' && msg.userId) {
+                        const newId = msg.userId;
+                        const meId = (JSON.parse(localStorage.getItem('teacherData')||'{}').id||null);
+                        if (newId && meId && newId !== meId) {
+                            // existing participants should create offers to new joiner
+                            createOfferForStudent(newId).catch(e=>console.warn('createOfferForStudent failed', e.message));
+                        }
+                    }
+
+                    if (msg.type === 'participant_left' && msg.userId) {
+                        const pid = msg.userId;
+                        if (teacherPeerConnections.has(pid)) {
+                            try { teacherPeerConnections.get(pid).close(); } catch (e) {}
+                            teacherPeerConnections.delete(pid);
+                        }
+                        const audioEl = teacherRemoteElements.get(pid);
+                        if (audioEl) {
+                            try { audioEl.remove(); } catch (e) {}
+                            teacherRemoteElements.delete(pid);
+                        }
+                    }
+
+                    // When a student joins, initiate WebRTC offer to that student so teacher can send A/V
+                    if (msg.type === 'student_joined') {
+                        const studentId = msg.studentId;
+                        console.log('📣 student_joined', studentId);
+                        try { createOfferForStudent(studentId); } catch (e) { console.warn('Offer create failed:', e.message); }
+                    }
+
+                    // WebRTC signaling messages targeted to teacher
+                    if (msg.type === 'webrtc_answer' && msg.from) {
+                        const pc = teacherPeerConnections.get(msg.from);
+                        if (pc && msg.sdp) {
+                            pc.setRemoteDescription({ type: 'answer', sdp: msg.sdp }).catch(e=>console.warn('setRemoteDescription failed', e.message));
+                        }
+                    }
+
+                    if (msg.type === 'webrtc_ice' && msg.from) {
+                        const pc = teacherPeerConnections.get(msg.from);
+                        if (pc && msg.candidate) {
+                            pc.addIceCandidate(msg.candidate).catch(e=>console.warn('addIceCandidate failed', e.message));
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error processing teacher WS message:', err);
+                }
+            };
+
+        // Create a peer connection and offer to a studentId
+        async function createOfferForStudent(studentId) {
+            if (!teacherWs || teacherWs.readyState !== WebSocket.OPEN) return;
+            if (teacherPeerConnections.has(studentId)) return; // already connected
+
+            const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            teacherPeerConnections.set(studentId, pc);
+
+            // Add local tracks (teacher camera/mic) if available
+            try {
+                if (videoCallState.localStream) {
+                    videoCallState.localStream.getTracks().forEach(track => pc.addTrack(track, videoCallState.localStream));
+                }
+            } catch (e) { console.warn('Could not add local tracks to PC:', e.message); }
+
+            // When receiving remote tracks from student (audio), attach to audio element
+            pc.ontrack = (evt) => {
+                try {
+                    const stream = evt.streams && evt.streams[0] ? evt.streams[0] : new MediaStream(evt.track ? [evt.track] : []);
+                    let audioEl = teacherRemoteElements.get(studentId);
+                    if (!audioEl) {
+                        audioEl = document.createElement('audio');
+                        audioEl.autoplay = true;
+                        audioEl.style.display = 'none';
+                        document.body.appendChild(audioEl);
+                        teacherRemoteElements.set(studentId, audioEl);
+                    }
+                    audioEl.srcObject = stream;
+                } catch (e) { console.warn('ontrack handling failed', e.message); }
+            };
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    teacherWs.send(JSON.stringify({ type: 'webrtc_ice', to: studentId, from: (JSON.parse(localStorage.getItem('teacherData')||'{}').id||null), candidate: event.candidate }));
+                }
+            };
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            teacherWs.send(JSON.stringify({ type: 'webrtc_offer', to: studentId, from: (JSON.parse(localStorage.getItem('teacherData')||'{}').id||null), sdp: offer.sdp }));
+        }
+
+            teacherWs.onclose = () => {
+                console.log('Teacher WebSocket closed. Reconnecting in 5s...');
+                setTimeout(connectTeacherWebSocket, 5000);
+            };
+
+            teacherWs.onerror = (err) => {
+                console.error('Teacher WebSocket error:', err);
+            };
+        }
+
+        // Handle manage schedule form submission
+        document.getElementById('manage-schedule-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const courseCode = e.target.dataset.courseCode;
+            const startDate = document.getElementById('manage-start-date').value;
+            const startTime = document.getElementById('manage-start-time').value;
+            const endDate = document.getElementById('manage-end-date').value;
+            const endTime = document.getElementById('manage-end-time').value;
+            const frequency = document.getElementById('manage-frequency').value;
+            const location = document.getElementById('manage-location').value;
+            const courseName = document.getElementById('manage-course-name').value;
+
+            if (!startDate || !startTime || !endDate || !endTime || !frequency || !location) {
+                alert('❌ Please fill in all required fields!');
+                return;
+            }
+
+            // Generate meeting ID
+            const meetingId = 'APKL-' + courseCode + '-' + Date.now().toString(36).toUpperCase();
+
+            // Get student emails for this course
+            const studentEmails = await getStudentEmailsForCourse(courseCode);
+
+            try {
+                // Call server API to save schedule and send emails
+                const response = await fetch(`${API_URL}/api/class/schedule`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        courseCode: courseCode,
+                        courseName: courseName,
+                        startDate: startDate,
+                        startTime: startTime,
+                        endTime: endTime,
+                        frequency: frequency,
+                        location: location,
+                        studentEmails: studentEmails,
+                        meetingId: meetingId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    alert('❌ Failed to schedule class: ' + data.message);
+                    return;
+                }
+
+                // Also save to localStorage
+                const schedules = JSON.parse(localStorage.getItem('course_schedules') || '{}');
+                schedules[courseCode] = {
+                    courseCode: courseCode,
+                    courseName: courseName,
+                    startDate: startDate,
+                    startTime: startTime,
+                    endDate: endDate,
+                    endTime: endTime,
+                    frequency: frequency,
+                    location: location,
+                    meetingId: meetingId,
+                    studentEmails: studentEmails,
+                    savedAt: new Date().toISOString()
+                };
+                localStorage.setItem('course_schedules', JSON.stringify(schedules));
+
+                // Show success message
+                alert(`✅ Schedule saved and notifications sent!\n\nCourse: ${courseName}\n\nStart: ${startDate} at ${startTime}\nEnd: ${endDate} at ${endTime}\nFrequency: ${frequency}\nLocation: ${location}\n\nEmails sent to ${studentEmails.length} students`);
+
+                // Update all Manage buttons to Start buttons for this course
+                updateCourseButtonToStart(courseCode);
+
+                // Close modal
+                document.getElementById('manage-schedule-modal').classList.add('hidden');
+
+            } catch (error) {
+                console.error('Error scheduling class:', error);
+                const msg = (error && error.message && error.message.toLowerCase().includes('failed to fetch')) ? '❌ Fail to fetch' : ('❌ Error scheduling class: ' + (error.message || 'Unknown error'));
+                try { showError(msg); } catch (e) { alert(msg); }
+            }
+        });
+
+        // NOTE: duplicate updateCourseButtonToStart removed so earlier implementation is used
+
+        // Start course class (server-integrated)
+        async function startCourseClass(courseCode) {
+            try {
+                const teacher = JSON.parse(localStorage.getItem('teacherData') || '{}');
+                const teacherId = teacher.id || teacher.userId || teacher.email || null;
+                
+                if (!teacherId) {
+                    alert('⚠️ Teacher not logged in');
+                    return;
+                }
+                
+                // Try to reuse scheduled meetingId from server if available, otherwise generate one
+                let meetingId = null;
+                try {
+                    const schedResp = await fetch(`${API_URL}/api/class/schedule/${encodeURIComponent(courseCode)}`);
+                    if (schedResp.ok) {
+                        const schedData = await schedResp.json().catch(()=>({}));
+                        if (schedData && Array.isArray(schedData.schedules) && schedData.schedules.length > 0) {
+                            // Prefer next upcoming schedule
+                            const now = new Date();
+                            const schedules = schedData.schedules.sort((a,b) => new Date(`${a.startDate}T${a.startTime}`) - new Date(`${b.startDate}T${b.startTime}`));
+                            const chosen = schedules.find(s => new Date(`${s.startDate}T${s.startTime}`) >= now) || schedules[0];
+                            if (chosen && chosen.meetingId) meetingId = chosen.meetingId;
+                        }
+                    }
+                } catch (e) { /* ignore */ }
+
+                if (!meetingId) {
+                    meetingId = 'APKL-' + Math.random().toString(36).substr(2, 9).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                }
+                
+                // Save meeting info before requesting camera
+                localStorage.setItem('activeTeacherClass', JSON.stringify({
+                    meetingId: meetingId,
+                    courseCode: courseCode,
+                    startedAt: new Date().toISOString()
+                }));
+
+                // Notify server that class is starting
+                try {
+                    // 1) Mark schedule as started (updates schedules file and broadcasts)
+                    try {
+                        const respSchedule = await fetch(`${API_URL}/api/class/start`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ courseCode, meetingId, teacherId })
+                        });
+                        const scheduleData = await respSchedule.json().catch(()=>({}));
+                        if (!scheduleData.success) console.warn('⚠️ /api/class/start warning:', scheduleData.message || 'no response');
+                        else console.log('✅ /api/class/start acknowledged');
+                    } catch (err) { console.warn('⚠️ Could not call /api/class/start:', err.message); }
+
+                    // 2) Create server-managed active session (activeClasses map)
+                    try {
+                        const respActive = await fetch(`${API_URL}/api/classes/start`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ courseCode, meetingId, teacherId })
+                        });
+                        const activeData = await respActive.json().catch(()=>({}));
+                        if (!activeData.success) console.warn('⚠️ /api/classes/start warning:', activeData.message || 'no response');
+                        else console.log('✅ /api/classes/start acknowledged - active session created');
+                    } catch (err) { console.warn('⚠️ Could not call /api/classes/start:', err.message); }
+                    // Announce presence on WebSocket for meeting signaling
+                    try {
+                        if (teacherWs && teacherWs.readyState === WebSocket.OPEN) {
+                            teacherWs.send(JSON.stringify({ type: 'join_meeting', meetingId, userId: teacherId, displayName: teacher.name || 'Teacher' }));
+                        }
+                    } catch (e) { /* ignore */ }
+                } catch (err) {
+                    console.warn('⚠️ Could not connect to server:', err.message);
+                }
+
+                // Open video call modal
+                const videoCallModal = document.getElementById('video-call-modal');
+                if (videoCallModal) {
+                    videoCallModal.classList.remove('hidden');
+                    videoCallState.meetingId = meetingId;
+                    videoCallState.isActive = true;
+                    videoCallState.currentCourseCode = courseCode;
+
+                    // Set meeting info
+                    const savedCourses = JSON.parse(localStorage.getItem('teacher_courses_' + (teacher.id||'default')) || 'null');
+                    let courseName = courseCode;
+                    if (savedCourses) {
+                        const course = savedCourses.find(c=>c.code===courseCode);
+                        if (course) courseName = course.name;
+                    } else {
+                        const track = teacher.track || 'web-dev';
+                        const trackData = trackCoursesMap[track] || trackCoursesMap['web-dev'];
+                        if (trackData && trackData.courses) {
+                            const course = trackData.courses.find(c=>c.code===courseCode);
+                            if (course) courseName = course.name;
+                        }
+                    }
+
+                    document.getElementById('meeting-title').textContent = `${courseName} (${courseCode}) - Live Class`;
+                    document.getElementById('meeting-code').textContent = 'Meeting ID: ' + meetingId;
+
+                    // Initialize video call
+                    initializeVideoCall(meetingId, courseCode);
+
+                    // Notify connected students via WebSocket that class started
+                    try {
+                        if (teacherWs && teacherWs.readyState === WebSocket.OPEN) {
+                            teacherWs.send(JSON.stringify({ type: 'class_started', courseCode, meetingId, classDetails: { courseName } }));
+                        }
+                    } catch (e) { console.warn('Could not send class_started WS message', e); }
+
+                    console.log('🎥 Class started for course: ' + courseCode);
+                    console.log('📊 Meeting ID: ' + meetingId);
+                }
+            } catch (error) {
+                console.error('Error starting class:', error);
+                alert('Failed to start class. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
