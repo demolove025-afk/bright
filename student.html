@@ -481,7 +481,7 @@
         // Load courses from API based on track
         async function loadCoursesFromAPI(track) {
             try {
-                const response = await fetch(`http://127.0.0.1:5002/api/courses?track=${track}`);
+                const response = await fetch(`${window.appConfig?.API_URL || 'http://127.0.0.1:5002'}/api/courses?track=${track}`);
                 const data = await response.json();
                 
                 if (!data.success || !data.courses) {
@@ -1178,10 +1178,19 @@
                     return;
                 }
 
-                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${wsProtocol}//127.0.0.1:5002`;
-
-                ws = new WebSocket(wsUrl);
+                // Build WebSocket URL from configured API_URL so it works on Render or localhost
+                try {
+                    const api = (window.appConfig && window.appConfig.API_URL) ? window.appConfig.API_URL : window.location.origin;
+                    const urlObj = new URL(api);
+                    const wsProtocol = (urlObj.protocol === 'https:') ? 'wss:' : 'ws:';
+                    const wsUrl = `${wsProtocol}//${urlObj.hostname}${urlObj.port ? ':' + urlObj.port : ''}`;
+                    ws = new WebSocket(wsUrl);
+                } catch (e) {
+                    // Fallback to localhost
+                    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    const wsUrl = `${wsProtocol}//127.0.0.1:5002`;
+                    ws = new WebSocket(wsUrl);
+                }
 
                 ws.onopen = () => {
                     console.log('✅ Connected to WebSocket');

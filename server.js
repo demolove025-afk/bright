@@ -35,7 +35,7 @@ const WebSocket = require('ws');
 const http = require('http');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 const USER_JSON_PATH = path.join(__dirname, 'user.json');
 
 // Store connected WebSocket clients by userId
@@ -3297,9 +3297,10 @@ app.post('/api/broadcast/scheduled', async (req, res) => {
   }
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`✅ Server running on http://127.0.0.1:${PORT}`);
-  console.log(`🔌 WebSocket server ready on ws://127.0.0.1:${PORT}`);
+const LISTEN_HOST = process.env.HOST || '0.0.0.0';
+server.listen(PORT, LISTEN_HOST, () => {
+  console.log(`✅ Server running on http://${LISTEN_HOST}:${PORT}`);
+  console.log(`🔌 WebSocket server ready on ws://${LISTEN_HOST}:${PORT}`);
   console.log(`📝 API Endpoints:`);
   console.log(`   POST /api/auth/register - Register new user`);
   console.log(`   POST /api/auth/login - User login`);
